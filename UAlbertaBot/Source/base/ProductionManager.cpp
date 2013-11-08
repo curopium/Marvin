@@ -33,7 +33,7 @@ ProductionManager::ProductionManager()
 	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
 	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
 	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
+	
 	
 
 	setBuildOrder(buildOrder);
