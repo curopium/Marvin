@@ -631,10 +631,16 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 
+	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+
+
 	int mutasWanted = numMutas + 6;
 	int hydrasWanted = numHydras + 6;
+	int ZerglingsWanted = numZergling + 6;
 
-	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
+
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
 
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));

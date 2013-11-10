@@ -25,15 +25,10 @@ ProductionManager::ProductionManager()
 	
 	std::vector<MetaType> buildOrder;
 
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Spawning_Pool));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-	
+	//put manual build orders here
+	//buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Spawning_Pool));
+	//buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
+
 	
 
 	setBuildOrder(buildOrder);
@@ -85,15 +80,21 @@ void ProductionManager::update()
 	// if they have cloaked units get a new goal asap
 	if (!enemyCloakedDetected && InformationManager::Instance().enemyHasCloakedUnits())
 	{
-		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
-		{
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-		}
 
-		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
+		//What detecting units it will build are race specific
+		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
 		{
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
+
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
+			{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+			}
+
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
+			{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
+			}
 		}
 
 		BWAPI::Broodwar->printf("Enemy Cloaked Unit Detected!");
