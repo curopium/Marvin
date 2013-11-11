@@ -623,11 +623,75 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal() const
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
+const bool StrategyManager::expandZerg() const
+{
+
+	// if there is no place to expand to, we can't expand
+	if (MapTools::Instance().getNextExpansion() == BWAPI::TilePositions::None)
+	{
+		return false;
+	}
+
+	//int numHatchery =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	//int numHydralisk =			BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int frame =					BWAPI::Broodwar->getFrameCount();
+	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	int numHydralisk  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+
+	// if there are more than 10 idle workers, expand
+	if (WorkerManager::Instance().getNumIdleWorkers() > 10)
+	{
+		return true;
+	}
+
+	// 2nd Nexus Conditions:
+	//		We have 12 or more hydralisks
+	//		It is past frame 7000
+	if ((numHatchery < 2) && (numHydralisk > 12 || frame > 9000))
+	{
+		return true;
+	}
+
+	// 3nd Nexus Conditions:
+	//		We have 24 or more hydralisks
+	//		It is past frame 12000
+	if ((numHatchery < 3) && (numHydralisk > 24 || frame > 15000))
+	{
+		return true;
+	}
+
+	if ((numHatchery < 4) && (numHydralisk > 24 || frame > 21000))
+	{
+		return true;
+	}
+
+	if ((numHatchery < 5) && (numHydralisk > 24 || frame > 26000))
+	{
+		return true;
+	}
+
+	if ((numHatchery < 6) && (numHydralisk > 24 || frame > 30000))
+	{
+		return true;
+	}
+
+	return false;
+
+
+}
+
+
 const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 {
 	// the goal to return
-	std::vector< std::pair<MetaType, UnitCountType> > goal;
+	MetaPairVector goal;
 	
+	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	int numDrone =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+
+	int numHydraDen =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
+
+
 	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 
@@ -635,15 +699,27 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 
 
 	int mutasWanted = numMutas + 6;
-	int hydrasWanted = numHydras + 6;
+	int hydrasWanted = numHydras + 4;
 	int ZerglingsWanted = numZergling + 6;
+	int DronesWanted = numDrone + 2;
+
+
+	if (expandZerg())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
+	}
+
+	if (numHydraDen > 0)
+	{
+		
+		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Grooved_Spines, 1));
+		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Muscular_Augments, 1));
+	}
+
 
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
-
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
-
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone,	std::min(90, DronesWanted)));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
