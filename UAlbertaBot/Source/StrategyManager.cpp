@@ -719,7 +719,7 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone,	std::min(90, DronesWanted)));
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone,	std::min(90, DronesWanted)));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
