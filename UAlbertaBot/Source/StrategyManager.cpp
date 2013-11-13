@@ -724,6 +724,24 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
+const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
+{
+	// the goal to return
+	MetaPairVector goal;
+
+	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+
+	//int ZerglingsWanted = numZergling + 4;
+
+
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 4));
+
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 12));
+
+
+	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
+}
+
  const int StrategyManager::getCurrentStrategy()
  {
 	 return currentStrategy;

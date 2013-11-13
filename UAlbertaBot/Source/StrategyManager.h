@@ -58,6 +58,7 @@ class StrategyManager
 
 	// Zerg Strategy
 	const	bool				expandZerg() const;
+	const   MetaPairVector      getZergBuildOrderGoal2() const;
 
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
