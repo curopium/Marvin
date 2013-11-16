@@ -116,6 +116,12 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Muscular_Augments, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Grooved_Spines, actions.size()));
 
+			actions.push_back(StarcraftAction(BWAPI::TechTypes::Lurker_Aspect, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker_Egg, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));
+			
+			
+
 			/*
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern, actions.size()));

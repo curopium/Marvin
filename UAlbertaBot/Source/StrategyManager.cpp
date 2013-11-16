@@ -681,6 +681,7 @@ const bool StrategyManager::expandZerg() const
 }
 
 
+//Hydra Rush
 const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 {
 	// the goal to return
@@ -704,6 +705,7 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	int DronesWanted = numDrone + 2;
 
 
+
 	if (expandZerg())
 	{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
@@ -718,12 +720,15 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 
 
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
+
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lurker, LurkersWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
 	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone,	std::min(90, DronesWanted)));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
+//Zergling rush conatainer
 const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
 {
 	// the goal to return
@@ -736,6 +741,51 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
 
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 4));
 
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 12));
+
+
+	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
+}
+
+//Lurker build
+const MetaPairVector StrategyManager::getZergBuildOrderGoal3() const
+{
+	// the goal to return
+	MetaPairVector goal;
+
+	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	int numLurkers  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
+	int numLair     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
+	int numHydralisk=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	bool lurker_tech =			BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect);
+
+
+	int HydrasWanted  = numHydralisk + 6;
+	//int LurkersWanted = numLurkers + 4;
+	//int ZerglingsWanted = numZergling + 4;
+
+	if(numLurkers == 0)
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk_Den, 1));
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+		if( numLair == 1)
+		{
+			goal.push_back(MetaPair(BWAPI::TechTypes::Lurker_Aspect, 1));
+		}
+
+	}
+
+	if (lurker_tech == true)
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, HydrasWanted));
+	}
+
+	if (numHydralisk > 0 )
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lurker, 1));
+	}
+
+	
 	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 12));
 
 
