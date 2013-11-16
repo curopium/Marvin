@@ -116,6 +116,7 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Muscular_Augments, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Grooved_Spines, actions.size()));
 
+			/*
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Ultralisk, actions.size()));
@@ -134,6 +135,7 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Queens_Nest, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Devourer, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Infested_Terran, actions.size()));
+			*/
 
 		}	
 	}
