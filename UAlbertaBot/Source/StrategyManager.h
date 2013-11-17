@@ -87,4 +87,6 @@ public:
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
+
+	
 };

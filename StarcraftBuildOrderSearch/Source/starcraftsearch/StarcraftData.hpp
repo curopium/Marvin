@@ -120,25 +120,28 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker_Egg, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));
 			
-			
 
-			/*
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Queens_Nest, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Hive, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Ultralisk, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Hive, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Defiler_Mound, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Defiler, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Greater_Spire, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Guardian, actions.size()));
+
+
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Evolution_Chamber, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Creep_Colony, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Sunken_Colony, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Spore_Colony, actions.size()));
+
+			/*
+
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Defiler_Mound, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Defiler, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Greater_Spire, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Guardian, actions.size()));
+
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Scourge, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Nydus_Canal, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Queen, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Queens_Nest, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Devourer, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Infested_Terran, actions.size()));
 			*/
