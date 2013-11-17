@@ -739,17 +739,28 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
 {
 	// the goal to return
 	MetaPairVector goal;
-
+	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-	int numUltra     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	//int numUltra     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
 
-	int ZerglingsWanted = numZergling + 4;
+	int ZerglingsWanted = numZergling + 2;
 	//int UltraWanted = numUltra + 4;
 
 	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Creep_Colony, 4));
 	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Sunken_Colony, 4));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 
+	if (numZergling > 6)
+	{
+		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Metabolic_Boost, 1));
+	}
+
+	if (expandZerg())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
+	}
+
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Greater_Spire, 1));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }

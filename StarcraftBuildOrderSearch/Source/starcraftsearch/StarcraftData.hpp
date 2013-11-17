@@ -115,6 +115,8 @@ class StarcraftData {
 			//needed to add an extension here for the rest of the zerg units/upgrades
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Muscular_Augments, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Grooved_Spines, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Adrenal_Glands, actions.size()));
+			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Metabolic_Boost, actions.size()));
 
 			actions.push_back(StarcraftAction(BWAPI::TechTypes::Lurker_Aspect, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker_Egg, actions.size()));

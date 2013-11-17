@@ -352,7 +352,9 @@ void ProductionManager::createMetaType(BWAPI::Unit * producer, MetaType t)
 	if (t.isUnit() && t.unitType.isBuilding() 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Lair 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Hive
-		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire)
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Spore_Colony)
 	{
 		// send the building task to the building manager
 		BuildingManager::Instance().addBuildingTask(t.unitType, BWAPI::Broodwar->self()->getStartLocation());
@@ -382,7 +384,7 @@ void ProductionManager::createMetaType(BWAPI::Unit * producer, MetaType t)
 	else
 	{	
 		// critical error check
-//		assert(false);
+		//assert(false);
 
 		//Logger::Instance().log("createMetaType error: " + t.getName() + "\n");
 	}

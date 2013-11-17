@@ -197,7 +197,9 @@ private:
 				if (GSN_DEBUG) printf("\t\tZerg Building - Remove Drone\n");
 
 				// special case of morphed buildings
-				if (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire)
+				if (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire ||
+					DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony ||
+					DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony )
 				{
 					// the previous building starts morphing into this one
 				}
@@ -282,11 +284,32 @@ private:
 				maxSupply -= DATA[DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery)].supplyProvided();
 			}
 
+			// if it's a Hive, remove the lair
+			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive))
+			{
+				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Lair)]--;
+
+				// take away the supply that was provided by the hatchery
+				maxSupply -= DATA[DATA.getAction(BWAPI::UnitTypes::Zerg_Lair)].supplyProvided();
+			}
+
 			// if it's a Greater Spire, remove the spire
-			//if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
-			//{
-			///	numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spire)]--;
-			//}
+			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
+			{
+				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spire)]--;
+			}
+
+			// if it's a Sunken colony, remove the Creep colony
+			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony))
+			{
+				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony)]--;
+			}
+
+			// if it's a Spore colony, remove the Creep colony
+			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony))
+			{
+				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony)]--;
+			}
 
 			fixZergUnitMasks();
 		}
@@ -309,10 +332,27 @@ private:
 			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
 		}
 
-		//if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Greater_Spire)] > 0)
-		//{
-		//	completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
-		//}
+		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Hive)] > 0)
+		{
+			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
+			//completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
+		}
+
+		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Greater_Spire)] > 0)
+		{
+			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
+		}
+
+		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Sunken_Colony)] > 0)
+		{
+			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
+		}
+
+		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spore_Colony)] > 0)
+		{
+			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
+		}
+
 	}
 
 public: 
@@ -1638,6 +1678,7 @@ public:
 				// special cases for zerg trickle down prerequisites
 				if (DATA.getRace() == BWAPI::Races::Zerg)
 				{
+
 					// if it's a Lair, remove the hatchery
 					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair))
 					{
@@ -1645,10 +1686,25 @@ public:
 					}
 
 					// if it's a Greater Spire, remove the spire
-					//if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
-					//{
-					//	completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
-					//}
+					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
+					{
+						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
+					}
+					// if its a hive, remove the lair
+					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive))
+					{
+						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
+					}
+					// if spore or sunken colony, remove creep colony
+					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony))
+					{
+						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
+					}
+
+					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony))
+					{
+						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
+					}
 				}
 			}
 		}
