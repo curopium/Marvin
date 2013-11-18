@@ -760,7 +760,7 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
 	}
 
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Greater_Spire, 1));
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hive, 1));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }

@@ -335,7 +335,7 @@ private:
 		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Hive)] > 0)
 		{
 			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
-			//completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
+			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
 		}
 
 		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Greater_Spire)] > 0)
@@ -1694,6 +1694,7 @@ public:
 					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive))
 					{
 						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
+						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));				
 					}
 					// if spore or sunken colony, remove creep colony
 					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony))
