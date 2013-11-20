@@ -2,7 +2,8 @@
 #define TRANSPOSITION_TABLE_H
 
 #include <vector>
-
+namespace BuildOrderSearch
+{
 template <class HashType, class FType>
 class TranspositionTable {
 
@@ -113,5 +114,5 @@ public:
 		return collisions;
 	}
 };
-
+}
 #endif

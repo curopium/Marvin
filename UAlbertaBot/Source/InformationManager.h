@@ -5,7 +5,7 @@
 
 #include "UnitData.h"
 
-#include "..\..\AdversarialSearch\source\Map.hpp"
+#include "..\..\SparCraft\source\SparCraft.h"
 
 struct BaseInfo;
 typedef std::vector<BaseInfo> BaseInfoVector;
@@ -14,7 +14,7 @@ class InformationManager {
 
 	InformationManager();
 
-	MicroSearch::Map					map;
+	SparCraft::Map					map;
 
 	UnitData							enemyUnitData;
 	UnitData							selfUnitData;
@@ -87,7 +87,7 @@ public:
 
 	void						drawUnitInformation(int x, int y);
 
-	MicroSearch::Map *			getMap() { return &map; }
+	SparCraft::Map *			getMap() { return &map; }
 };
 
 

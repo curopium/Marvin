@@ -19,14 +19,17 @@ StrategyManager & StrategyManager::Instance()
 	return instance;
 }
 
-void StrategyManager::addStrategies()
+void StrategyManager::addStrategies() 
 {
 	protossOpeningBook = std::vector<std::string>(NumProtossStrategies);
 	terranOpeningBook  = std::vector<std::string>(NumTerranStrategies);
 	zergOpeningBook    = std::vector<std::string>(NumZergStrategies);
 
-	protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
-	protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 0 0";
+	//protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
+    protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
+	//protossOpeningBook[ProtossZealotRush]	= "0";
+	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
+    protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
@@ -179,7 +182,17 @@ void StrategyManager::setStrategy()
 	else
 	{
 		// otherwise return a random strategy
-		currentStrategy = ProtossZealotRush;
+
+        std::string enemyName(BWAPI::Broodwar->enemy()->getName());
+        
+        if (enemyName.compare("Skynet") == 0)
+        {
+            currentStrategy = ProtossDarkTemplar;
+        }
+        else
+        {
+            currentStrategy = ProtossZealotRush;
+        }
 	}
 
 }
@@ -261,7 +274,7 @@ const std::string StrategyManager::getOpeningBook() const
 
 // when do we want to defend with our workers?
 // this function can only be called if we have no fighters to defend with
-const bool StrategyManager::defendWithWorkers()
+const int StrategyManager::defendWithWorkers()
 {
 	if (!Options::Micro::WORKER_DEFENSE)
 	{
@@ -281,7 +294,7 @@ const bool StrategyManager::defendWithWorkers()
 	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->enemy()->getUnits())
 	{
 		// if it's a zergling or a worker we want to defend
-		if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling || unit->getType().isWorker())
+		if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling)
 		{
 			if (unit->getDistance(homePosition) < defenseRadius)
 			{
@@ -291,7 +304,7 @@ const bool StrategyManager::defendWithWorkers()
 	}
 
 	// if there are enemy units near our workers, we want to defend
-	return enemyUnitsNearWorkers > 0;
+	return enemyUnitsNearWorkers;
 }
 
 // called by combat commander to determine whether or not to send an attack force
@@ -300,7 +313,7 @@ const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 {
 	int ourForceSize = (int)freeUnits.size();
 
-	int numUnitsNeededForAttack = 3;
+	int numUnitsNeededForAttack = 1;
 
 	bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) >= 1
 					|| ourForceSize >= numUnitsNeededForAttack;
@@ -391,7 +404,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 	}
 	else
 	{
-		return getZergBuildOrderGoal2();
+		return getZergBuildOrderGoal();
 	}
 }
 
@@ -623,190 +636,21 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal() const
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
-const bool StrategyManager::expandZerg() const
-{
-
-	// if there is no place to expand to, we can't expand
-	if (MapTools::Instance().getNextExpansion() == BWAPI::TilePositions::None)
-	{
-		return false;
-	}
-
-	//int numHatchery =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
-	//int numHydralisk =			BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
-	int frame =					BWAPI::Broodwar->getFrameCount();
-	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
-	int numHydralisk  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
-
-	// if there are more than 10 idle workers, expand
-	if (WorkerManager::Instance().getNumIdleWorkers() > 10)
-	{
-		return true;
-	}
-
-	// 2nd Nexus Conditions:
-	//		We have 12 or more hydralisks
-	//		It is past frame 7000
-	if ((numHatchery < 2) && (numHydralisk > 12 || frame > 9000))
-	{
-		return true;
-	}
-
-	// 3nd Nexus Conditions:
-	//		We have 24 or more hydralisks
-	//		It is past frame 12000
-	if ((numHatchery < 3) && (numHydralisk > 24 || frame > 15000))
-	{
-		return true;
-	}
-
-	if ((numHatchery < 4) && (numHydralisk > 24 || frame > 21000))
-	{
-		return true;
-	}
-
-	if ((numHatchery < 5) && (numHydralisk > 24 || frame > 26000))
-	{
-		return true;
-	}
-
-	if ((numHatchery < 6) && (numHydralisk > 24 || frame > 30000))
-	{
-		return true;
-	}
-
-	return false;
-
-
-}
-
-
-//Hydra Rush
 const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 {
 	// the goal to return
-	MetaPairVector goal;
+	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
-	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
-	int numDrone =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
-
-	int numHydraDen =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
-
-
 	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 
-	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-
-
 	int mutasWanted = numMutas + 6;
-	int hydrasWanted = numHydras + 4;
-	int ZerglingsWanted = numZergling + 6;
-	int DronesWanted = numDrone + 2;
+	int hydrasWanted = numHydras + 6;
 
+	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
 
-
-	if (expandZerg())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
-	}
-
-	if (numHydraDen > 0)
-	{
-		
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Grooved_Spines, 1));
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Muscular_Augments, 1));
-	}
-
-	if (numHydras > 12) 
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
-	}
-	else
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
-	}
-
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lurker, LurkersWanted));
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, 4));
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone,	std::min(90, DronesWanted)));
-
-	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
-}
-
-//Zergling rush conatainer
-const MetaPairVector StrategyManager::getZergBuildOrderGoal2() const
-{
-	// the goal to return
-	MetaPairVector goal;
-	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
-	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-	//int numUltra     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-
-	int ZerglingsWanted = numZergling + 2;
-	//int UltraWanted = numUltra + 4;
-
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Creep_Colony, 4));
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Sunken_Colony, 4));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
-
-	if (numZergling > 6)
-	{
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Metabolic_Boost, 1));
-	}
-
-	if (expandZerg())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numHatchery + 1));
-	}
-
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hive, 1));
-
-	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
-}
-
-//Lurker build
-const MetaPairVector StrategyManager::getZergBuildOrderGoal3() const
-{
-	// the goal to return
-	MetaPairVector goal;
-
-	int numZergling  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-	int numLurkers   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
-	int numLair      =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
-	int numHydralisk =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
-	bool lurker_tech =			BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect);
-
-
-	int HydrasWanted  = numHydralisk + 6;
-	//int LurkersWanted = numLurkers + 4;
-	//int ZerglingsWanted = numZergling + 4;
-
-	
-	if(lurker_tech == 0)
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk_Den, 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
-		if( numLair == 1)
-		{
-			goal.push_back(MetaPair(BWAPI::TechTypes::Lurker_Aspect, 1));
-		}
-
-	}
-	if(lurker_tech == 1)
-	{
-
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hydralisk, 4));
-	}
-
-	//if (numHydralisk > 0 )
-	//{
-	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lurker, 1));
-	//}
-
-	
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, 12));
-
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }

@@ -130,7 +130,6 @@ public:
 	BWAPI::Unit * getClosestUnitToTarget(BWAPI::UnitType type, BWAPI::Position target);
 	BWAPI::Unit * getClosestWorkerToTarget(BWAPI::Position target);
 
-	void onSendText(std::string text);
 	void onUnitShow(BWAPI::Unit * unit);
 	void onUnitHide(BWAPI::Unit * unit);
 	void onUnitCreate(BWAPI::Unit * unit);

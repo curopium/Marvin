@@ -25,11 +25,17 @@ UAlbertaBotModule::~UAlbertaBotModule() {}
 void UAlbertaBotModule::onStart()
 {
 	BWAPI::Broodwar->setLocalSpeed(0);
+	//BWAPI::Broodwar->setFrameSkip(240);
+
+    SparCraft::init();
 
 	BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	//BWAPI::Broodwar->enableFlag(BWAPI::Flag::CompleteMapInformation);
 
-	if (Options::Modules::USING_GAMECOMMANDER)
+    Options::BotModes::SetBotMode(Options::BotModes::AIIDE_TOURNAMENT);
+	Options::Modules::checkOptions();
+	
+    if (Options::Modules::USING_GAMECOMMANDER)
 	{
 		BWTA::readMap();
 		BWTA::analyze();
@@ -37,9 +43,15 @@ void UAlbertaBotModule::onStart()
 	
 	if (Options::Modules::USING_MICRO_SEARCH)
 	{
-		Search::StarcraftData::init();
-		MicroSearch::Hash::initHash();
-		micro.onStart();
+		SparCraft::init();
+		
+		//micro.onStart();
+	}
+
+	if (Options::Modules::USING_BUILD_LEARNER)
+	{
+		BuildOrderSearch::getStarcraftDataInstance().init(BWAPI::Broodwar->self()->getRace());
+		SparCraft::Hash::initHash();
 	}
 }
 
@@ -52,14 +64,39 @@ void UAlbertaBotModule::onEnd(bool isWinner)
 		std::stringstream result;
 		std::string win = isWinner ? "win" : "lose";
 
-		result << "Game against " << BWAPI::Broodwar->enemy()->getName() << " " << win << " with strategy " << StrategyManager::Instance().getCurrentStrategy() << "\n";
+		double sum = 0;
+		BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->self()->getUnits())
+		{
+			if (unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+			{
+				sum += sqrt((double)(unit->getHitPoints() + unit->getShields()));
+			}
+		}
+		BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->enemy()->getUnits())
+		{
+			if (unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+			{
+				sum -= sqrt((double)(unit->getHitPoints() + unit->getShields()));
+			}
+		}
+
+		//result << "Game against " << BWAPI::Broodwar->enemy()->getName() << " " << win << " with strategy " << StrategyManager::Instance().getCurrentStrategy() << "\n";
+
+		result << sum << " " << BWAPI::Broodwar->getFrameCount() << "\n";
 
 		Logger::Instance().log(result.str());
-	}
+
+		ProductionManager::Instance().onGameEnd();
+	}	
 }
 
 void UAlbertaBotModule::onFrame()
 {
+	if (Options::Modules::USING_UNIT_COMMAND_MGR)
+	{
+		UnitCommandManager::Instance().update();
+	}
+
 	if (Options::Modules::USING_GAMECOMMANDER) 
 	{ 
 		gameCommander.update(); 
@@ -72,8 +109,9 @@ void UAlbertaBotModule::onFrame()
 
 	if (Options::Modules::USING_MICRO_SEARCH)
 	{
-		micro.update();
+		//micro.update();
 	}
+
 
 	if (Options::Modules::USING_REPLAY_VISUALIZER)
 	{
@@ -87,9 +125,6 @@ void UAlbertaBotModule::onFrame()
 			}
 		}
 	}
-
-	//Visualizer::Instance().setBWAPIState();
-	//Visualizer::Instance().onFrame();
 }
 
 void UAlbertaBotModule::onUnitDestroy(BWAPI::Unit * unit)
@@ -107,7 +142,6 @@ void UAlbertaBotModule::onSendText(std::string text)
 { 
 	BWAPI::Broodwar->sendText(text.c_str());
 
-
 	if (Options::Modules::USING_REPLAY_VISUALIZER && (text.compare("sim") == 0))
 	{
 		BWAPI::Unit * selected = NULL;
@@ -123,14 +157,49 @@ void UAlbertaBotModule::onSendText(std::string text)
 		if (selected)
 		{
 			#ifdef USING_VISUALIZATION_LIBRARIES
-				ReplayVisualizer rv;
-				rv.launchSimulation(selected->getPosition(), 1000);
+				//ReplayVisualizer rv;
+				//rv.launchSimulation(selected->getPosition(), 1000);
 			#endif
 		}
 	}
-	else if (text.compare("sim") != 0)
+
+	if (Options::Modules::USING_BUILD_ORDER_DEMO)
 	{
-		BWAPI::Broodwar->setLocalSpeed(atoi(text.c_str()));
+
+		std::stringstream type;
+		std::stringstream numUnitType;
+		int numUnits = 0;
+
+		int i=0;
+		for (i=0; i<text.length(); ++i)
+		{
+			if (text[i] == ' ')
+			{
+				i++;
+				break;
+			}
+
+			type << text[i];
+		}
+
+		for (; i<text.length(); ++i)
+		{
+			numUnitType << text[i];
+		}
+
+		numUnits = atoi(numUnitType.str().c_str());
+
+	
+		BWAPI::UnitType t = BWAPI::UnitTypes::getUnitType(type.str());
+
+		BWAPI::Broodwar->printf("Searching for %d of %s", numUnits, t.getName().c_str());
+
+		MetaPairVector goal;
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe, 8));
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway, 2));
+		goal.push_back(MetaPair(t, numUnits));
+
+		ProductionManager::Instance().setSearchGoal(goal);
 	}
 }
 

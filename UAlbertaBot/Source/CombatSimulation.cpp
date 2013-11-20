@@ -10,34 +10,43 @@ CombatSimulation::CombatSimulation()
 // this center will most likely be the position of the forwardmost combat unit we control
 void CombatSimulation::setCombatUnits(const BWAPI::Position & center, const int radius)
 {
-	MicroSearch::GameState s;
-	s.setMaxUnits(100);
+	SparCraft::GameState s;
 
 	BWAPI::Broodwar->drawCircleMap(center.x(), center.y(), 10, BWAPI::Colors::Red, true);
 
 	std::vector<BWAPI::Unit *> ourCombatUnits;
 	std::vector<UnitInfo> enemyCombatUnits;
+
 	MapGrid::Instance().GetUnits(ourCombatUnits,   center, Options::Micro::COMBAT_REGROUP_RADIUS, true, false);
 	InformationManager::Instance().getNearbyForce(enemyCombatUnits, center, BWAPI::Broodwar->enemy(), Options::Micro::COMBAT_REGROUP_RADIUS);
 
-
-	int y = 0;
-
 	BOOST_FOREACH (BWAPI::Unit * unit, ourCombatUnits)
 	{
-		if (InformationManager::Instance().isCombatUnit(unit->getType()))
+        if (InformationManager::Instance().isCombatUnit(unit->getType()) && SparCraft::System::isSupportedUnitType(unit->getType()))
 		{
-			s.addUnit(MicroSearch::Unit(unit, getPlayer(BWAPI::Broodwar->self()), BWAPI::Broodwar->getFrameCount()));
+            try
+            {
+			    s.addUnit(getSparCraftUnit(unit));
+            }
+            catch (int e)
+            {
+                BWAPI::Broodwar->printf("Problem Adding Self Unit with ID: %d", unit->getID());
+            }
 		}
 	}
 
-	y++;
-
 	BOOST_FOREACH (UnitInfo ui, enemyCombatUnits)
 	{
-		if (!ui.type.isFlyer())
+        if (!ui.type.isFlyer() && SparCraft::System::isSupportedUnitType(ui.type) && ui.completed)
 		{
-			s.addUnit(getUnit(ui, getPlayer(BWAPI::Broodwar->enemy())));
+            try
+            {
+			    s.addUnit(getSparCraftUnit(ui));
+            }
+            catch (int e)
+            {
+                BWAPI::Broodwar->printf("Problem Adding Enemy Unit with ID: %d", ui.unitID);
+            }
 		}
 	}
 
@@ -46,74 +55,88 @@ void CombatSimulation::setCombatUnits(const BWAPI::Position & center, const int 
 	state = s;
 }
 
-const MicroSearch::Unit CombatSimulation::getUnit(const UnitInfo & ui, const IDType & playerID) const
+// Gets a SparCraft unit from a BWAPI::Unit, used for our own units since we have all their info
+const SparCraft::Unit CombatSimulation::getSparCraftUnit(BWAPI::Unit * unit) const
+{
+    return SparCraft::Unit( unit->getType(),
+                            SparCraft::Position(unit->getPosition()), 
+                            unit->getID(), 
+                            getSparCraftPlayerID(unit->getPlayer()), 
+                            unit->getHitPoints() + unit->getShields(), 
+                            0,
+		                    BWAPI::Broodwar->getFrameCount(), 
+                            BWAPI::Broodwar->getFrameCount());	
+}
+
+// Gets a SparCraft unit from a UnitInfo struct, needed to get units of enemy behind FoW
+const SparCraft::Unit CombatSimulation::getSparCraftUnit(const UnitInfo & ui) const
 {
 	BWAPI::UnitType type = ui.type;
+
+    // this is a hack, treat medics as a marine for now
 	if (type == BWAPI::UnitTypes::Terran_Medic)
 	{
 		type = BWAPI::UnitTypes::Terran_Marine;
 	}
 
-	return MicroSearch::Unit(ui.type, MicroSearch::Position(ui.lastPosition.x(), ui.lastPosition.y()), ui.unitID, playerID, ui.lastHealth, 0,
-		BWAPI::Broodwar->getFrameCount(), BWAPI::Broodwar->getFrameCount());	
+    return SparCraft::Unit( ui.type, 
+                            SparCraft::Position(ui.lastPosition), 
+                            ui.unitID, 
+                            getSparCraftPlayerID(ui.player), 
+                            ui.lastHealth, 
+                            0,
+		                    BWAPI::Broodwar->getFrameCount(), 
+                            BWAPI::Broodwar->getFrameCount());	
 }
 
-std::pair<ScoreType, ScoreType> CombatSimulation::simulateCombat()
+ScoreType CombatSimulation::simulateCombat()
 {
-	MicroSearch::GameState s1(state);
-	MicroSearch::GameState s2(state);
+    try
+    {
+	    SparCraft::GameState s1(state);
 
-	MicroSearch::PlayerPtr selfChase(new MicroSearch::Player_NOK_AttackDPS(getPlayer(BWAPI::Broodwar->self())));
-	MicroSearch::PlayerPtr selfKiter(new MicroSearch::Player_KiterDPS(getPlayer(BWAPI::Broodwar->self())));
+        SparCraft::PlayerPtr selfNOK(new SparCraft::Player_NOKDPS(getSparCraftPlayerID(BWAPI::Broodwar->self())));
 
-	MicroSearch::PlayerPtr enemyChase(new MicroSearch::Player_AttackClosest(getPlayer(BWAPI::Broodwar->enemy())));
-	MicroSearch::PlayerPtr enemyKiter(new MicroSearch::Player_KiterDPS(getPlayer(BWAPI::Broodwar->enemy())));
+	    SparCraft::PlayerPtr enemyNOK(new SparCraft::Player_NOKDPS(getSparCraftPlayerID(BWAPI::Broodwar->enemy())));
 
-	MicroSearch::Game gameOptimistic (s1, selfChase, enemyChase, 1000);
-	MicroSearch::Game gamePessimistic(s2, selfChase, enemyKiter, 1000);
+	    SparCraft::Game g (s1, selfNOK, enemyNOK, 2000);
 
-	gameOptimistic.playScripts();
-	gamePessimistic.playScripts();
+	    g.play();
 	
-	ScoreType evalOptimistic =  gameOptimistic.getState().eval(Search::Players::Player_One, Search::EvaluationMethods::SumDPS).val();
-	ScoreType evalPessimistic = gamePessimistic.getState().eval(Search::Players::Player_One, Search::EvaluationMethods::SumDPS).val();
+	    ScoreType eval =  g.getState().eval(SparCraft::Players::Player_One, SparCraft::EvaluationMethods::LTD2).val();
 
-	BWAPI::Broodwar->drawTextScreen(240, 280, "Optimistic : %d", evalOptimistic);
-	BWAPI::Broodwar->drawTextScreen(240, 295, "Pessimistic: %d", evalPessimistic);
+	    BWAPI::Broodwar->drawTextScreen(240, 280, "Combat Sim : %d", eval);
+        
+	    return eval;
+    }
+    catch (int e)
+    {
+        BWAPI::Broodwar->printf("SparCraft FatalError, simulateCombat() threw");
 
-	if (evalOptimistic > 1000000 || evalOptimistic < -1000000)
-	{
-		logState(gameOptimistic.getState());
-	}
-
-	return std::pair<ScoreType, ScoreType>(evalOptimistic, evalPessimistic);
+        return -1;
+    }
 }
 
-const MicroSearch::GameState & CombatSimulation::getState() const
+const SparCraft::GameState & CombatSimulation::getSparCraftState() const
 {
 	return state;
 }
 
-const IDType CombatSimulation::getPlayer(BWAPI::Unit * unit) const
-{
-	return getPlayer(unit->getPlayer());
-}
-
-const IDType CombatSimulation::getPlayer(BWAPI::Player * player) const
+const IDType CombatSimulation::getSparCraftPlayerID(BWAPI::Player * player) const
 {
 	if (player == BWAPI::Broodwar->self())
 	{
-		return Search::Players::Player_One;
+		return SparCraft::Players::Player_One;
 	}
 	else if (player == BWAPI::Broodwar->enemy())
 	{
-		return Search::Players::Player_Two;
+		return SparCraft::Players::Player_Two;
 	}
 
-	return Search::Players::Player_None;
+	return SparCraft::Players::Player_None;
 }
 
-void CombatSimulation::logState(const MicroSearch::GameState & state)
+void CombatSimulation::logState(const SparCraft::GameState & state)
 {
 	if (hasLogged)
 	{
@@ -122,21 +145,21 @@ void CombatSimulation::logState(const MicroSearch::GameState & state)
 
 	std::stringstream log;
 
-	log << "State: [EVAL=" << state.evalSumDPS(0) << ", SUMSQRT=(" << state.getTotalSumDPS(0) << "," << state.getTotalSumDPS(1) << ")\n";
+	//log << "State: [EVAL=" << state.eval(0) << ", SUMSQRT=(" << state.getTotalSumDPS(0) << "," << state.getTotalSumDPS(1) << ")\n";
 
-	for (size_t p(0); p<Search::Constants::Num_Players; ++p)
+	for (size_t p(0); p<SparCraft::Constants::Num_Players; ++p)
 	{
 		log << "Player " << p << " units:\n";
 
 		for (size_t u(0); u<state.numUnits(p); ++u)
 		{
-			const MicroSearch::Unit & unit(state.getUnit(p, u));
+			const SparCraft::Unit & unit(state.getUnit(p, u));
 
 			log << "Unit " << u << ": " << unit.name() << " [HP=" << unit.currentHP() << ", X=" << unit.x() << ", Y=" << unit.y() << "]\n";
 		}
 	}
 
-	Logger::Instance().log(log.str());
+	//Logger::Instance().log(log.str());
 
 	hasLogged = true;
 }

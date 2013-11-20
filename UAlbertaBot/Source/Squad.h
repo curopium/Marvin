@@ -48,6 +48,9 @@ class Squad
 
 	BWAPI::Unit *		unitClosestToEnemy();
 
+    static int          lastRetreatSwitch;
+    static bool         lastRetreatSwitchVal;
+
 public:
 
 

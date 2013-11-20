@@ -10,9 +10,11 @@ struct UnitInfo
 
 	int					unitID;
 	int					lastHealth;
+    BWAPI::Player *     player;
 	BWAPI::Unit *		unit;
 	BWAPI::Position		lastPosition;
 	BWAPI::UnitType		type;
+    bool                completed;
 
 	bool canCloak() const
 	{
@@ -34,20 +36,25 @@ struct UnitInfo
 	UnitInfo()
 		: unitID(0)
 		, lastHealth(0)
+        , player(NULL)
 		, unit(NULL)
 		, lastPosition(BWAPI::Positions::None)
 		, type(BWAPI::UnitTypes::None)
+        , completed(false)
 	{
 
 	}
 
 	UnitInfo(int id, BWAPI::Unit * u, BWAPI::Position last, BWAPI::UnitType t) 
+        : unitID(id)
+        , lastHealth(u->getHitPoints() + u->getShields())
+        , player(u->getPlayer())
+		, unit(u)
+		, lastPosition(last)
+		, type(t)
+        , completed(u->isCompleted())
 	{
-		unitID = id;
-		unit = u;
-		lastHealth = u->getHitPoints() + u->getShields();
-		lastPosition = last;
-		type = t;
+		
 	}
 
 	const bool operator == (BWAPI::Unit * unit) const

@@ -3,7 +3,7 @@
 #ifdef USING_VISUALIZATION_LIBRARIES
 
 #include "Common.h"
-
+/*
 ReplayVisualizer::ReplayVisualizer() 
 	: map(BWAPI::Broodwar)
 {
@@ -13,49 +13,48 @@ ReplayVisualizer::ReplayVisualizer()
 void ReplayVisualizer::launchSimulation(const BWAPI::Position & center, const int & radius)
 {
 	// set up the display object
-	MicroSearch::Display display(MicroSearch::Display(BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight()));
+	SparCraft::Display display(SparCraft::Display(BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight()));
 	display.OnStart();
 	display.LoadMapTexture(&map, 19);
 
 	// extract the state from the current state of BWAPI
-	MicroSearch::GameState state;
+	SparCraft::GameState state;
 	setCombatUnits(state, center, radius);
 	state.setMap(&map);
 
 	// get search player objects for us and the opponent
-	PlayerPtr selfPlayer(getSearchPlayer(Search::PlayerToMove::Alternate, Search::Players::Player_One, Search::EvaluationMethods::ModelSimulation, 40));
-	PlayerPtr enemyPlayer(MicroSearch::Players::getPlayer(Search::Players::Player_Two, Search::PlayerModels::AttackClosest));
+	PlayerPtr selfPlayer(getSearchPlayer(SparCraft::PlayerToMove::Alternate, SparCraft::Players::Player_One, SparCraft::EvaluationMethods::Playout, 40));
+	PlayerPtr enemyPlayer(SparCraft::AllPlayers::getPlayerPtr(SparCraft::Players::Player_Two, SparCraft::PlayerModels::AttackClosest));
 
 	// set up the game
-	MicroSearch::Game g(state, selfPlayer, enemyPlayer, 1000);
+	SparCraft::Game g(state, selfPlayer, enemyPlayer, 1000);
 	g.disp = &display;
 
 	// play the game to the end
-	g.play(true);
+	g.play();
 }
 
-void ReplayVisualizer::setCombatUnits(MicroSearch::GameState & state, const BWAPI::Position & center, const int radius)
+void ReplayVisualizer::setCombatUnits(SparCraft::GameState & state, const BWAPI::Position & center, const int radius)
 {
-	state.setMaxUnits(200);
 
 	int selfUnits = 0;
-	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getPlayer(0)->getUnits())
+	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getPlayer(1)->getUnits())
 	{
 		bool inRadius = unit->getDistance(center) < radius;
 
 		if (selfUnits < 8 && inRadius && isCombatUnit(unit->getType()))
 		{
 			selfUnits++;
-			state.addUnit(MicroSearch::Unit(unit, Search::Players::Player_One, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addUnit(SparCraft::Unit(unit, SparCraft::Players::Player_One, BWAPI::Broodwar->getFrameCount()));
 		}
 		else
 		{
-			state.addNeutralUnit(MicroSearch::Unit(unit, Search::Players::Player_One, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addNeutralUnit(SparCraft::Unit(unit, SparCraft::Players::Player_One, BWAPI::Broodwar->getFrameCount()));
 		}
 	}
 
 	int enemyUnits = 0;
-	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getPlayer(1)->getUnits())
+	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getPlayer(0)->getUnits())
 	{
 		if (enemyUnits >= 8)
 		{
@@ -67,11 +66,11 @@ void ReplayVisualizer::setCombatUnits(MicroSearch::GameState & state, const BWAP
 		if (enemyUnits < 8 && inRadius && isCombatUnit(unit->getType()) && !unit->getType().isFlyer())
 		{
 			enemyUnits++;
-			state.addUnit(MicroSearch::Unit(unit,Search::Players::Player_Two, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addUnit(SparCraft::Unit(unit,Search::Players::Player_Two, BWAPI::Broodwar->getFrameCount()));
 		}
 		else
 		{
-			state.addNeutralUnit(MicroSearch::Unit(unit, Search::Players::Player_Two, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addNeutralUnit(SparCraft::Unit(unit, Search::Players::Player_Two, BWAPI::Broodwar->getFrameCount()));
 		}
 	}
 
@@ -85,7 +84,7 @@ void ReplayVisualizer::setCombatUnits(MicroSearch::GameState & state, const BWAP
 		if (unit->getType() == BWAPI::UnitTypes::Resource_Mineral_Field ||
 			unit->getType() == BWAPI::UnitTypes::Resource_Vespene_Geyser)
 		{
-			state.addNeutralUnit(MicroSearch::Unit(unit, Search::Players::Player_None, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addNeutralUnit(SparCraft::Unit(unit, Search::Players::Player_None, BWAPI::Broodwar->getFrameCount()));
 		}
 	}
 
@@ -116,15 +115,15 @@ bool ReplayVisualizer::isCombatUnit(BWAPI::UnitType type) const
 
 PlayerPtr ReplayVisualizer::getSearchPlayer(const IDType & playerToMoveMethod, const IDType & playerID, const IDType & evalMethod, const size_t & timeLimitMS)
 {
-	IDType bestResponseTo = Search::PlayerModels::No_Overkill_DPS;
+    IDType bestResponseTo = SparCraft::PlayerModels::NOKDPS;
 
 	// base parameters to use in search
-	MicroSearch::MicroSearchParameters baseParameters;
+	SparCraft::AlphaBetaSearchParameters baseParameters;
 	baseParameters.setMaxPlayer(playerID);
-	baseParameters.setSearchMethod(Search::SearchMethods::IDAlphaBeta);
+	baseParameters.setSearchMethod(SparCraft::SearchMethods::IDAlphaBeta);
 	baseParameters.setEvalMethod(evalMethod);
-	baseParameters.setMaxDepth(Search::Constants::Max_Search_Depth);
-	baseParameters.setScriptMoveFirstMethod(Search::PlayerModels::No_Overkill_DPS);
+	baseParameters.setMaxDepth(SparCraft::Constants::Max_Search_Depth);
+    //baseParameters.setScriptMoveFirstMethod(SparCraft::PlayerModels::NOKDPS);
 	baseParameters.setTimeLimit(timeLimitMS);
 	
 	// IF USING OPPONENT MODELING SET IT HERE
@@ -152,14 +151,14 @@ const IDType ReplayVisualizer::getPlayer(BWAPI::Player * player) const
 {
 	if (player == BWAPI::Broodwar->self())
 	{
-		return Search::Players::Player_One;
+		return SparCraft::Players::Player_Two;
 	}
 	else if (player == BWAPI::Broodwar->enemy())
 	{
-		return Search::Players::Player_Two;
+		return SparCraft::Players::Player_One;
 	}
 
-	return Search::Players::Player_None;
+	return SparCraft::Players::Player_None;
 }
-
+*/
 #endif

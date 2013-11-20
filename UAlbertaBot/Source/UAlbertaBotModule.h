@@ -8,10 +8,12 @@
 #include "MapTools.h"
 #include "HardCodedInfo.h"
 #include "../../StarcraftBuildOrderSearch/Source/starcraftsearch/StarcraftData.hpp"
-#include "MicroSearchManager.h"
-#include "ReplayVisualizer.h"
+//#include "SparCraftManager.h"
+//#include "ReplayVisualizer.h"
 
+#include "../../SparCraft/source/SparCraft.h"
 #include "EnhancedInterface.hpp"
+#include "UnitCommandManager.h"
 
 #include "Options.h"
 
@@ -19,7 +21,7 @@ class UAlbertaBotModule : public BWAPI::AIModule
 {
 	GameCommander			gameCommander;
 	EnhancedInterface		eui;
-	MicroSearchManager		micro;
+	//SparCraftManager		micro;
 
 public:
 			

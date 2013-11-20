@@ -9,9 +9,9 @@ Visualizer & Visualizer::Instance()
 }
 
 Visualizer::Visualizer() 
-	: display(MicroSearch::Display(BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight()))
+	: display(SparCraft::Display(BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight()))
 {
-	map = MicroSearch::Map(BWAPI::Broodwar);
+	map = SparCraft::Map(BWAPI::Broodwar);
 	map.write("C:\\test.txt");
 	display.OnStart();
 	
@@ -20,24 +20,23 @@ Visualizer::Visualizer()
 
 void Visualizer::setBWAPIState()
 {
-	MicroSearch::GameState state;
-	state.setMaxUnits(200);
+	SparCraft::GameState state;
 	state.setMap(&map);
 
 	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getAllUnits())
 	{
 		const IDType player(getPlayer(unit->getPlayer()));
 
-		if (player == Search::Players::Player_One || player == Search::Players::Player_Two)
+		if (player == SparCraft::Players::Player_One || player == SparCraft::Players::Player_Two)
 		{
-			state.addUnit(MicroSearch::Unit(unit, player, BWAPI::Broodwar->getFrameCount()));
+			// FIX state.addUnit(SparCraft::Unit(unit, player, BWAPI::Broodwar->getFrameCount()));
 		}
 		else
 		{
 			if (unit->getType() == BWAPI::UnitTypes::Resource_Mineral_Field ||
 				unit->getType() == BWAPI::UnitTypes::Resource_Vespene_Geyser)
 			{
-				state.addNeutralUnit(MicroSearch::Unit(unit, Search::Players::Player_None, BWAPI::Broodwar->getFrameCount()));
+				// FIX state.addNeutralUnit(SparCraft::Unit(unit, SparCraft::Players::Player_None, BWAPI::Broodwar->getFrameCount()));
 			}
 		}
 	}
@@ -45,7 +44,7 @@ void Visualizer::setBWAPIState()
 	setState(state);
 }
 
-void Visualizer::setState(const MicroSearch::GameState & state)
+void Visualizer::setState(const SparCraft::GameState & state)
 {
 	display.SetState(state);
 }
@@ -64,14 +63,14 @@ const IDType Visualizer::getPlayer(BWAPI::Player * player) const
 {
 	if (player == BWAPI::Broodwar->self())
 	{
-		return Search::Players::Player_One;
+		return SparCraft::Players::Player_One;
 	}
 	else if (player == BWAPI::Broodwar->enemy())
 	{
-		return Search::Players::Player_Two;
+		return SparCraft::Players::Player_Two;
 	}
 
-	return Search::Players::Player_None;
+	return SparCraft::Players::Player_None;
 }
 
 #endif

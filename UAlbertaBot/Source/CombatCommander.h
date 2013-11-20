@@ -19,6 +19,7 @@ class CombatCommander
 
 	// Functions
 
+    void				assignScoutDefenseSquads();
 	void				assignDefenseSquads(std::set<BWAPI::Unit *> & combatUnits);
 	void				assignAttackSquads(std::set<BWAPI::Unit *> & combatUnits);
 	void				assignIdleSquads(std::set<BWAPI::Unit *> & combatUnits);

@@ -53,8 +53,41 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 	// we want to do this if the order is attack, defend, or harass
 	if (order.type == order.Attack || order.type == order.Defend) 
 	{
-		// Allow micromanager to handle enemies
-		executeMicro(nearbyEnemies);
+        // if this is a worker defense force
+        if (units.size() == 1 && units[0]->getType().isWorker())
+        {
+            executeMicro(nearbyEnemies);
+        }
+        // otherwise it is a normal attack force
+        else
+        {
+             // remove enemy worker units unless they are in one of their occupied regions
+            UnitVector workersRemoved;
+
+            BOOST_FOREACH (BWAPI::Unit * enemyUnit, nearbyEnemies) 
+		    {
+                // if its not a worker add it to the targets
+			    if (!enemyUnit->getType().isWorker())
+                {
+                    workersRemoved.push_back(enemyUnit);
+                }
+                // if it is a worker
+                else
+                {
+                    BOOST_FOREACH(BWTA::Region * enemyRegion, InformationManager::Instance().getOccupiedRegions(BWAPI::Broodwar->enemy()))
+                    {
+                        // only add it if it's in their region
+                        if (BWTA::getRegion(BWAPI::TilePosition(enemyUnit->getPosition())) == enemyRegion)
+                        {
+                            workersRemoved.push_back(enemyUnit);
+                        }
+                    }
+                }
+		    }
+
+		    // Allow micromanager to handle enemies
+		    executeMicro(workersRemoved);
+        }
 	}	
 }
 

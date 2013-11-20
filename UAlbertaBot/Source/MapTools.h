@@ -31,10 +31,6 @@ class MapTools
 	// the fringe vector which is used as a sort of 'open list'
 	std::vector<int>	fringe;
 
-	// stores a 'region number'
-	// two tiles are connected iff their region numbers are the same
-	std::vector<int> 	connected;
-
 	// the size of the map
 	int					rows,
 						cols;
@@ -47,8 +43,6 @@ class MapTools
 	inline int getIndex(int row, int col);
 
 	bool unexplored(DistanceMap & dmap, const int index) const;
-	
-	bool unconnected(const int index) const;
 	
 	// resets the distance and fringe vectors, call before each search
 	void reset();

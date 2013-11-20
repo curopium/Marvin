@@ -23,11 +23,9 @@ void CombatCommander::update(std::set<BWAPI::Unit *> unitsToAssign)
 
 		// give back combat workers to worker manager
 		WorkerManager::Instance().finishedWithCombatWorkers();
-
-		// if there are no units to assign, there's nothing to do
-		if (unitsToAssign.empty()) { return; }
-
+        
 		// Assign defense and attack squads
+        assignScoutDefenseSquads();
 		assignDefenseSquads(unitsToAssign);
 		assignAttackSquads(unitsToAssign);
 		assignIdleSquads(unitsToAssign);
@@ -90,6 +88,50 @@ BWTA::Region * CombatCommander::getClosestEnemyRegion()
 	}
 
 	return closestEnemyRegion;
+}
+
+void CombatCommander::assignScoutDefenseSquads() 
+{
+	// for each of our occupied regions
+	BOOST_FOREACH(BWTA::Region * myRegion, InformationManager::Instance().getOccupiedRegions(BWAPI::Broodwar->self()))
+	{
+		BWAPI::Position regionCenter = myRegion->getCenter();
+		if (!regionCenter.isValid())
+		{
+			continue;
+		}
+
+		// all of the enemy units in this region
+		std::set<BWAPI::Unit *> enemyUnitsInRegion;
+		BOOST_FOREACH (BWAPI::Unit * enemyUnit, BWAPI::Broodwar->enemy()->getUnits())
+		{			
+			if (BWTA::getRegion(BWAPI::TilePosition(enemyUnit->getPosition())) == myRegion)
+			{
+				enemyUnitsInRegion.insert(enemyUnit);
+			}
+		}
+
+        // special case: figure out if the only attacker is a worker, the enemy is scouting
+        if (enemyUnitsInRegion.size() == 1 && (*enemyUnitsInRegion.begin())->getType().isWorker())
+        {
+            // the enemy worker that is attacking us
+            BWAPI::Unit * enemyWorker       = *enemyUnitsInRegion.begin();
+
+            // get our worker unit that is mining that is closest to it
+            BWAPI::Unit * workerDefender    = WorkerManager::Instance().getClosestMineralWorkerTo(enemyWorker);
+
+            // grab it from the worker manager
+            WorkerManager::Instance().setCombatWorker(workerDefender);
+            
+            // put it into a unit vector
+            UnitVector workerDefenseForce;
+            workerDefenseForce.push_back(workerDefender);
+
+            // make a squad using the worker to defend
+            squadData.addSquad(Squad(workerDefenseForce, SquadOrder(SquadOrder::Defend, regionCenter, 1000, "Get That Scout!")));
+			return;
+        }
+	}
 }
 
 void CombatCommander::assignDefenseSquads(std::set<BWAPI::Unit *> & unitsToAssign) 

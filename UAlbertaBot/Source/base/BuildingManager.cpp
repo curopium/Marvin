@@ -176,7 +176,7 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 			int distance = b.type == BWAPI::UnitTypes::Protoss_Photon_Cannon ? 0 : 1;
 
 			// whether or not we want the distance to be horizontal only
-			bool horizontalOnly = true;
+            bool horizontalOnly = b.type == BWAPI::UnitTypes::Protoss_Citadel_of_Adun ? true : false;
 
 			// get a position within our region
 			BWAPI::TilePosition posInRegion =    BuildingPlacer::Instance().getBuildLocationNear(b, distance, true,  horizontalOnly);

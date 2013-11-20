@@ -7,13 +7,15 @@
 	#include "Visualizer.h"
 #endif
 
-#include "..\..\AdversarialSearch\source\GameState.h"
-#include "..\..\AdversarialSearch\source\Game.h"
+#include "..\..\SparCraft\source\GameState.h"
+#include "..\..\SparCraft\source\Game.h"
+#include "..\..\SparCraft\source\Unit.h"
+#include "..\..\SparCraft\source\AllPlayers.h"
 
 class CombatSimulation
 {
 
-	MicroSearch::GameState		state;
+	SparCraft::GameState		state;
 	bool						hasLogged;
 
 public:
@@ -22,12 +24,13 @@ public:
 
 	void setCombatUnits(const BWAPI::Position & center, const int radius);
 
-	std::pair<ScoreType, ScoreType> simulateCombat();
-	const MicroSearch::Unit			getUnit(const UnitInfo & ui, const IDType & playerID) const;
-	const MicroSearch::GameState &	getState() const;
+	ScoreType simulateCombat();
 
-	const IDType getPlayer(BWAPI::Unit * unit) const;
-	const IDType getPlayer(BWAPI::Player * player) const;
+	const SparCraft::Unit			getSparCraftUnit(const UnitInfo & ui) const;
+    const SparCraft::Unit			getSparCraftUnit(BWAPI::Unit * unit) const;
+	const SparCraft::GameState &	getSparCraftState() const;
 
-	void logState(const MicroSearch::GameState & state);
+	const IDType getSparCraftPlayerID(BWAPI::Player * player) const;
+
+	void logState(const SparCraft::GameState & state);
 };

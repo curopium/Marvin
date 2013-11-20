@@ -1,14 +1,16 @@
 #include "Common.h"
 #include "Squad.h"
 
+int  Squad::lastRetreatSwitch = 0;
+bool Squad::lastRetreatSwitchVal = false;
+
 Squad::Squad(const UnitVector & units, SquadOrder order) 
 	: units(units)
 	, order(order)
 {
 }
 
-void 
-Squad::update()
+void Squad::update()
 {
 	// update all necessary unit information within this squad
 	updateUnits();
@@ -24,7 +26,7 @@ Squad::update()
 		BWAPI::Unit * closest = unitClosestToEnemy();
 		if (closest && (BWAPI::Broodwar->getFrameCount() % 24 == 0))
 		{
-			BWAPI::Broodwar->setScreenPosition(closest->getPosition().x() - 320, closest->getPosition().y() - 200);
+			//BWAPI::Broodwar->setScreenPosition(closest->getPosition().x() - 320, closest->getPosition().y() - 200);
 		}
 	}
 
@@ -54,16 +56,14 @@ Squad::update()
 	}
 }
 
-void
-Squad::updateUnits()
+void Squad::updateUnits()
 {
 	setAllUnits();
 	setNearEnemyUnits();
 	setManagerUnits();
 }
 
-void 
-Squad::setAllUnits()
+void Squad::setAllUnits()
 {
 	// clean up the units vector just in case one of them died
 	UnitVector goodUnits;
@@ -81,8 +81,7 @@ Squad::setAllUnits()
 	units = goodUnits;
 }
 
-void 
-Squad::setNearEnemyUnits()
+void Squad::setNearEnemyUnits()
 {
 	nearEnemy.clear();
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
@@ -107,8 +106,7 @@ Squad::setNearEnemyUnits()
 	}
 }
 
-void 
-Squad::setManagerUnits()
+void Squad::setManagerUnits()
 {
 	UnitVector meleeUnits;
 	UnitVector rangedUnits;
@@ -150,8 +148,7 @@ Squad::setManagerUnits()
 }
 
 // calculates whether or not to regroup
-bool 
-Squad::needsToRegroup()
+bool Squad::needsToRegroup()
 {
 	// if we are not attacking, never regroup
 	if (units.empty() || (order.type != SquadOrder::Attack))
@@ -178,10 +175,28 @@ Squad::needsToRegroup()
 
 	CombatSimulation sim;
 	sim.setCombatUnits(unitClosest->getPosition(), Options::Micro::COMBAT_REGROUP_RADIUS + InformationManager::Instance().lastFrameRegroup*300);
-	
-	std::pair<ScoreType, ScoreType> score = sim.simulateCombat();
+	ScoreType score = sim.simulateCombat();
 
-	bool retreat = score.first < 0 && score.second < 0;
+    bool retreat = score < 0;
+    int switchTime = 100;
+    bool waiting = false;
+
+    // we should not attack unless 5 seconds have passed since a retreat
+    if (retreat != lastRetreatSwitchVal)
+    {
+        if (retreat == false && (BWAPI::Broodwar->getFrameCount() - lastRetreatSwitch < switchTime))
+        {
+            waiting = true;
+            retreat = lastRetreatSwitchVal;
+        }
+        else
+        {
+            waiting = false;
+            lastRetreatSwitch = BWAPI::Broodwar->getFrameCount();
+            lastRetreatSwitchVal = retreat;
+        }
+    }
+	
 	if (retreat)
 	{
 		regroupStatus = std::string("\x04 Retreat - simulation predicts defeat");
@@ -194,14 +209,12 @@ Squad::needsToRegroup()
 	return retreat;
 }
 
-void 
-Squad::setSquadOrder(const SquadOrder & so)
+void Squad::setSquadOrder(const SquadOrder & so)
 {
 	order = so;
 }
 
-bool 
-Squad::unitNearEnemy(BWAPI::Unit * unit)
+bool Squad::unitNearEnemy(BWAPI::Unit * unit)
 {
 	assert(unit);
 
@@ -212,8 +225,7 @@ Squad::unitNearEnemy(BWAPI::Unit * unit)
 	return enemyNear.size() > 0;
 }
 
-BWAPI::Position 
-Squad::calcCenter()
+BWAPI::Position Squad::calcCenter()
 {
 	BWAPI::Position accum(0,0);
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
@@ -223,8 +235,7 @@ Squad::calcCenter()
 	return BWAPI::Position(accum.x() / units.size(), accum.y() / units.size());
 }
 
-BWAPI::Position 
-Squad::calcRegroupPosition()
+BWAPI::Position Squad::calcRegroupPosition()
 {
 	BWAPI::Position regroup(0,0);
 
@@ -253,8 +264,7 @@ Squad::calcRegroupPosition()
 	}
 }
 
-BWAPI::Unit * 
-Squad::unitClosestToEnemy()
+BWAPI::Unit * Squad::unitClosestToEnemy()
 {
 	BWAPI::Unit * closest = NULL;
 	int closestDist = 100000;
@@ -299,8 +309,7 @@ Squad::unitClosestToEnemy()
 	return closest;
 }
 
-int 
-Squad::squadUnitsNear(BWAPI::Position p)
+int Squad::squadUnitsNear(BWAPI::Position p)
 {
 	int numUnits = 0;
 
@@ -315,8 +324,7 @@ Squad::squadUnitsNear(BWAPI::Position p)
 	return numUnits;
 }
 
-bool 
-Squad::squadObserverNear(BWAPI::Position p)
+bool Squad::squadObserverNear(BWAPI::Position p)
 {
 	BOOST_FOREACH (BWAPI::Unit * unit, units)
 	{
@@ -329,14 +337,12 @@ Squad::squadObserverNear(BWAPI::Position p)
 	return false;
 }
 
-const UnitVector &	
-Squad::getUnits() const	
+const UnitVector &Squad::getUnits() const	
 { 
 	return units; 
 } 
 
-const SquadOrder &	
-Squad::getSquadOrder()	const			
+const SquadOrder & Squad::getSquadOrder()	const			
 { 
 	return order; 
 }

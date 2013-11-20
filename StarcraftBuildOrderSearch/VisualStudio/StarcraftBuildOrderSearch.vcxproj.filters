@@ -55,14 +55,14 @@
     <ClInclude Include="..\Source\starcraftsearch\Common.h">
       <Filter>data</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\starcraftsearch\ArmySearch.hpp">
-      <Filter>data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\starcraftsearch\SmartArmySearch.hpp">
-      <Filter>data</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\starcraftsearch\StarcraftSearchConstraint.hpp">
       <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\starcraftsearch\ArmySearch.hpp">
+      <Filter>search</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\starcraftsearch\SmartArmySearch.hpp">
+      <Filter>search</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

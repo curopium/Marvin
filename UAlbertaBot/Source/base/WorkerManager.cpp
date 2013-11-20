@@ -1,7 +1,11 @@
 #include "Common.h"
 #include "WorkerManager.h"
 
-WorkerManager::WorkerManager() : workersPerRefinery(3) {}
+WorkerManager::WorkerManager() 
+    : workersPerRefinery(3) 
+{
+    previousClosestWorker = NULL;
+}
 
 void WorkerManager::update() 
 {
@@ -23,7 +27,7 @@ void WorkerManager::update()
 	drawResourceDebugInfo();
 	//drawWorkerInformation(450,20);
 
-	//workerData.drawDepotDebugInfo();
+	workerData.drawDepotDebugInfo();
 }
 
 void WorkerManager::updateWorkerStatus() 
@@ -147,6 +151,39 @@ void WorkerManager::finishedWithCombatWorkers()
 			setMineralWorker(worker);
 		}
 	}
+}
+
+BWAPI::Unit * WorkerManager::getClosestMineralWorkerTo(BWAPI::Unit * enemyUnit)
+{
+    BWAPI::Unit * closestMineralWorker = NULL;
+    double closestDist = 100000;
+
+    if (previousClosestWorker)
+    {
+        if (previousClosestWorker->getHitPoints() > 0)
+        {
+            return previousClosestWorker;
+        }
+    }
+
+    // for each of our workers
+	BOOST_FOREACH (BWAPI::Unit * worker, workerData.getWorkers())
+	{
+		// if it is a move worker
+        if (workerData.getWorkerJob(worker) == WorkerData::Minerals) 
+		{
+			double dist = worker->getDistance(enemyUnit);
+
+            if (!closestMineralWorker || dist < closestDist)
+            {
+                closestMineralWorker = worker;
+                dist = closestDist;
+            }
+		}
+	}
+
+    previousClosestWorker = closestMineralWorker;
+    return closestMineralWorker;
 }
 
 void WorkerManager::handleMoveWorkers() 

@@ -59,13 +59,10 @@
     <CodeAnalysisIgnoreGeneratedCode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CodeAnalysisIgnoreGeneratedCode>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>$(ProjectName)</TargetName>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Source;$(BWAPI_DIR)/include;$(BOOST_DIR);$(FREETYPE_DIR)/include/freetype2;$(FREETYPE_DIR)/include;$(SDL_IMAGE_DIR);$(SDL_DIR)/include;$(SDL_GFX_DIR);$(FTGL_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../SparCraft/source;../Source;$(BWAPI_DIR)/include;$(BOOST_DIR);$(FREETYPE_DIR)/include/freetype2;$(FREETYPE_DIR)/include;$(SDL_IMAGE_DIR);$(SDL_DIR)/include;$(SDL_GFX_DIR);$(FTGL_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -76,7 +73,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPId.lib;$(BWAPI_DIR)/lib/BWTAd.lib;$(BWAPI_DIR)/lib/tinyxmld.lib;$(BWAPI_DIR)/lib/CGAL-vc90-mt-gd.lib;$(BWAPI_DIR)/lib/libboost_thread-vc90-mt-gd-1_40.lib;$(BWAPI_DIR)/lib/gmp-vc90-mt-gd.lib;$(BWAPI_DIR)/lib/mpfr-vc90-mt-gd.lib;../../StarcraftBuildOrderSearch/VisualStudio/$(Configuration)/StarCraftData.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/GameState.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Common.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/AlphaBeta.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/MicroSearchParameters.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Player.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Hash.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/TranspositionTable.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Timer.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Game.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Display.obj;$(EXTERNAL_LIB_DIR)/SDL.lib;$(EXTERNAL_LIB_DIR)/SDLmain.lib;$(EXTERNAL_LIB_DIR)/opengl32.lib;$(EXTERNAL_LIB_DIR)/SDL_image.lib;$(EXTERNAL_LIB_DIR)/ftgl_static_MT.lib;$(EXTERNAL_LIB_DIR)/ftgl_dynamic_MT.lib;$(EXTERNAL_LIB_DIR)/SDL_gfx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPId.lib;$(BWAPI_DIR)/lib/BWTAd.lib;$(BWAPI_DIR)/lib/tinyxmld.lib;$(BWAPI_DIR)/lib/CGAL-vc90-mt-gd.lib;$(BWAPI_DIR)/lib/libboost_thread-vc90-mt-gd-1_40.lib;$(BWAPI_DIR)/lib/gmp-vc90-mt-gd.lib;$(BWAPI_DIR)/lib/mpfr-vc90-mt-gd.lib;../../StarcraftBuildOrderSearch/VisualStudio/$(Configuration)/StarCraftData.obj;$(Configuration)/SparCraft.lib;$(EXTERNAL_LIB_DIR)/SDL.lib;$(EXTERNAL_LIB_DIR)/SDLmain.lib;$(EXTERNAL_LIB_DIR)/opengl32.lib;$(EXTERNAL_LIB_DIR)/SDL_image.lib;$(EXTERNAL_LIB_DIR)/SDL_gfx.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -103,7 +100,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPI.lib;$(BWAPI_DIR)/lib/BWTA.lib;$(BWAPI_DIR)/lib/tinyxml.lib;$(BWAPI_DIR)/lib/CGAL-vc90-mt.lib;$(BWAPI_DIR)/lib/libboost_thread-vc90-mt-1_40.lib;$(BWAPI_DIR)/lib/gmp-vc90-mt.lib;$(BWAPI_DIR)/lib/mpfr-vc90-mt.lib;../../StarcraftBuildOrderSearch/VisualStudio/$(Configuration)/StarCraftData.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/GameState.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Common.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/AlphaBeta.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/MicroSearchParameters.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Player.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Hash.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/TranspositionTable.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Timer.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Game.obj;../../AdversarialSearch/VisualStudio/$(Configuration)/Display.obj;$(EXTERNAL_LIB_DIR)/SDL.lib;$(EXTERNAL_LIB_DIR)/SDLmain.lib;$(EXTERNAL_LIB_DIR)/opengl32.lib;$(EXTERNAL_LIB_DIR)/SDL_image.lib;$(EXTERNAL_LIB_DIR)/ftgl_static_MT.lib;$(EXTERNAL_LIB_DIR)/ftgl_dynamic_MT.lib;$(EXTERNAL_LIB_DIR)/SDL_gfx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPI.lib;$(BWAPI_DIR)/lib/BWTA.lib;$(BWAPI_DIR)/lib/tinyxml.lib;$(BWAPI_DIR)/lib/CGAL-vc90-mt.lib;$(BWAPI_DIR)/lib/libboost_thread-vc90-mt-1_40.lib;$(BWAPI_DIR)/lib/gmp-vc90-mt.lib;$(BWAPI_DIR)/lib/mpfr-vc90-mt.lib;../../StarcraftBuildOrderSearch/VisualStudio/$(Configuration)/StarCraftData.obj;$(Configuration)/SparCraft.lib;$(EXTERNAL_LIB_DIR)/SDL.lib;$(EXTERNAL_LIB_DIR)/SDLmain.lib;$(EXTERNAL_LIB_DIR)/opengl32.lib;$(EXTERNAL_LIB_DIR)/SDL_image.lib;$(EXTERNAL_LIB_DIR)/SDL_gfx.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -113,6 +110,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\base\BuildLearner.cpp" />
     <ClCompile Include="..\Source\CombatSimulation.cpp" />
     <ClCompile Include="..\Source\MicroSearchManager.cpp" />
     <ClCompile Include="..\Source\base\BuildingData.cpp" />
@@ -147,10 +145,13 @@
     <ClCompile Include="..\Source\SquadData.cpp" />
     <ClCompile Include="..\Source\StrategyManager.cpp" />
     <ClCompile Include="..\Source\UAlbertaBotModule.cpp" />
+    <ClCompile Include="..\Source\UnitCommandData.cpp" />
+    <ClCompile Include="..\Source\UnitCommandManager.cpp" />
     <ClCompile Include="..\Source\UnitData.cpp" />
     <ClCompile Include="..\Source\Visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\base\BuildLearner.h" />
     <ClInclude Include="..\Source\CombatSimulation.h" />
     <ClInclude Include="..\Source\MicroSearchManager.h" />
     <ClInclude Include="..\Source\base\BuildingData.h" />
@@ -189,6 +190,8 @@
     <ClInclude Include="..\Source\SquadOrder.h" />
     <ClInclude Include="..\Source\StrategyManager.h" />
     <ClInclude Include="..\Source\UAlbertaBotModule.h" />
+    <ClInclude Include="..\Source\UnitCommandData.h" />
+    <ClInclude Include="..\Source\UnitCommandManager.h" />
     <ClInclude Include="..\Source\UnitData.h" />
     <ClInclude Include="..\Source\Visualizer.h" />
   </ItemGroup>

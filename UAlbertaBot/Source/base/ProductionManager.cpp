@@ -20,20 +20,10 @@ ProductionManager::ProductionManager()
 {
 	populateTypeCharMap();
 
-	setBuildOrder(StarcraftBuildOrderSearchManager::Instance().getOpeningBuildOrder());
-
-	
-	std::vector<MetaType> buildOrder;
-
-	//put manual build orders here
-	//buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Spawning_Pool));
-	//buildOrder.push_back(MetaType(BWAPI::UnitTypes::Zerg_Zergling));
-
-	
-
-	setBuildOrder(buildOrder);
-	
-
+	if (!Options::Modules::USING_BUILD_LEARNER && !Options::Modules::USING_BUILD_ORDER_DEMO)
+	{
+		setBuildOrder(StarcraftBuildOrderSearchManager::Instance().getOpeningBuildOrder());
+	}
 }
 
 void ProductionManager::setBuildOrder(const std::vector<MetaType> & buildOrder)
@@ -57,44 +47,58 @@ void ProductionManager::performBuildOrderSearch(const std::vector< std::pair<Met
 	setBuildOrder(buildOrder);
 }
 
+void ProductionManager::setSearchGoal(MetaPairVector & goal)
+{
+	searchGoal = goal;
+}
+
 void ProductionManager::update() 
 {
 	// check the queue for stuff we can build
 	manageBuildOrderQueue();
 
+	if (Options::Modules::USING_BUILD_LEARNER)
+	{
+		if (queue.size() == 0)
+		{
+			queue.queueAsHighestPriority(buildLearner.getRandomLegalAction(), true);
+		}
+
+		return;
+	}
+
+	if ((queue.size() == 0) && Options::Modules::USING_BUILD_ORDER_DEMO)
+	{
+		performBuildOrderSearch(searchGoal);
+	}
+
 	// if nothing is currently building, get a new goal from the strategy manager
-	if (queue.size() == 0 && BWAPI::Broodwar->getFrameCount() > 100)
+	if ((queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10) && !Options::Modules::USING_BUILD_ORDER_DEMO)
 	{
 		BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
 		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
 		performBuildOrderSearch(newGoal);
 	}
 
-	// detect if there's a build order deadlock once per second
+	//// detect if there's a build order deadlock once per second
 	if ((BWAPI::Broodwar->getFrameCount() % 24 == 0) && detectBuildOrderDeadlock())
 	{
-		BWAPI::Broodwar->printf("Supply deadlock detected, building supply unit!");
+		BWAPI::Broodwar->printf("Supply deadlock detected, building pylon!");
 		queue.queueAsHighestPriority(MetaType(BWAPI::Broodwar->self()->getRace().getSupplyProvider()), true);
 	}
 
 	// if they have cloaked units get a new goal asap
 	if (!enemyCloakedDetected && InformationManager::Instance().enemyHasCloakedUnits())
 	{
-
-		//What detecting units it will build are race specific
-		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
+		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
 		{
+			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+		}
 
-			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
-			{
-				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-			}
-
-			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
-			{
-				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
-			}
+		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
+		{
+			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
 		}
 
 		BWAPI::Broodwar->printf("Enemy Cloaked Unit Detected!");
@@ -114,14 +118,17 @@ void ProductionManager::onUnitDestroy(BWAPI::Unit * unit)
 		return;
 	}
 		
-	// if it's a worker or a building, we need to re-search for the current goal
-	if ((unit->getType().isWorker() && !WorkerManager::Instance().isWorkerScout(unit)) || unit->getType().isBuilding())
+	if (Options::Modules::USING_MACRO_SEARCH)
 	{
-		BWAPI::Broodwar->printf("Critical unit died, re-searching build order");
-
-		if (unit->getType() != BWAPI::UnitTypes::Zerg_Drone)
+		// if it's a worker or a building, we need to re-search for the current goal
+		if ((unit->getType().isWorker() && !WorkerManager::Instance().isWorkerScout(unit)) || unit->getType().isBuilding())
 		{
-			performBuildOrderSearch(StrategyManager::Instance().getBuildOrderGoal());
+			BWAPI::Broodwar->printf("Critical unit died, re-searching build order");
+
+			if (unit->getType() != BWAPI::UnitTypes::Zerg_Drone)
+			{
+				performBuildOrderSearch(StrategyManager::Instance().getBuildOrderGoal());
+			}
 		}
 	}
 }
@@ -346,15 +353,15 @@ void ProductionManager::createMetaType(BWAPI::Unit * producer, MetaType t)
 		return;
 	}
 
+	buildLearner.addAction(t);
+
 	// TODO: special case of evolved zerg buildings needs to be handled
 
 	// if we're dealing with a building
 	if (t.isUnit() && t.unitType.isBuilding() 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Lair 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Hive
-		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire
-		&& t.unitType != BWAPI::UnitTypes::Zerg_Sunken_Colony
-		&& t.unitType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire)
 	{
 		// send the building task to the building manager
 		BuildingManager::Instance().addBuildingTask(t.unitType, BWAPI::Broodwar->self()->getStartLocation());
@@ -384,7 +391,7 @@ void ProductionManager::createMetaType(BWAPI::Unit * producer, MetaType t)
 	else
 	{	
 		// critical error check
-		//assert(false);
+//		assert(false);
 
 		//Logger::Instance().log("createMetaType error: " + t.getName() + "\n");
 	}
@@ -444,30 +451,6 @@ BWAPI::Unit * ProductionManager::selectUnitOfType(BWAPI::UnitType type, bool lea
 
 	// return what we've found so far
 	return NULL;
-}
-
-void ProductionManager::onSendText(std::string text)
-{
-	MetaType typeWanted(BWAPI::UnitTypes::None);
-	int numWanted = 0;
-
-	if (text.compare("clear") == 0)
-	{
-		searchGoal.clear();
-	}
-	else if (text.compare("search") == 0)
-	{
-		performBuildOrderSearch(searchGoal);
-		searchGoal.clear();
-	}
-	else if (text[0] >= 'a' && text[0] <= 'z')
-	{
-		MetaType typeWanted = typeCharMap[text[0]];
-		text = text.substr(2,text.size());
-		numWanted = atoi(text.c_str());
-
-		searchGoal.push_back(std::pair<MetaType, int>(typeWanted, numWanted));
-	}
 }
 
 void ProductionManager::populateTypeCharMap()
@@ -533,4 +516,7 @@ ProductionManager & ProductionManager::Instance() {
 	return instance;
 }
 
-
+void ProductionManager::onGameEnd()
+{
+	buildLearner.onGameEnd();
+}

@@ -1,18 +1,43 @@
 #pragma once
 
 #include "BWAPI.h"
+#include <cassert>
 
 namespace Options
 {
 	namespace Modules
 	{
-		extern const bool USING_GAMECOMMANDER;			// toggle GameCommander, effectively UAlbertaBot
-		extern const bool USING_ENHANCED_INTERFACE;		// toggle EnhancedUI, not needed for UAlbertaBot
-		extern const bool USING_REPLAY_VISUALIZER;		// toggle replay visualization tool for combat search demo
-		extern const bool USING_MICRO_SEARCH;			// toggle use of Micro Search, if false script used
-		extern const bool USING_MACRO_SEARCH;			// toggle use of Build Order Search, currently no backup
-		extern const bool USING_STRATEGY_IO;			// toggle the use of file io for strategy
+		extern bool USING_GAMECOMMANDER;			// toggle GameCommander, effectively UAlbertaBot
+		extern bool USING_SCOUTMANAGER;
+		extern bool USING_COMBATCOMMANDER;
+		extern bool USING_ENHANCED_INTERFACE;		// toggle EnhancedUI, not needed for UAlbertaBot
+		extern bool USING_REPLAY_VISUALIZER;		// toggle replay visualization tool for combat search demo
+		extern bool USING_UNIT_COMMAND_MGR;
+		extern bool USING_MICRO_SEARCH;				// toggle use of Micro Search, if false script used
+		extern bool USING_MACRO_SEARCH;				// toggle use of Build Order Search, currently no backup
+		extern bool USING_STRATEGY_IO;				// toggle the use of file io for strategy
+		extern bool USING_BUILD_LEARNER;			// toggle the use of build learning, must not be using macro search
+		extern bool USING_BUILD_ORDER_DEMO;			
+
+		void checkOptions();							// checks to see if options are set in a sane manner
 	}
+
+    namespace BotModes
+    {
+        enum 
+        {  
+            AIIDE_TOURNAMENT,       // full bot for AIIDE tournament
+            CIG_TOURNAMENT,       // full bot for AIIDE tournament
+            MICRO_SEARCH_TEST,      // testing micro search on custom maps
+            REPLAY_VIS_TEST,         // testing opengl visualization with replays
+			BUILD_ORDER_DEMO,
+            NUM_MODES
+        };
+
+        extern int CURRENT_BOT_MODE;
+
+        void SetBotMode(int mode);
+    }
 
 	namespace Tournament
 	{

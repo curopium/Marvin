@@ -190,11 +190,26 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b, int
 	int dx     = 0;
 	int dy     = 1;
 
+    SparCraft::Timer t;
+    t.start();
+    int iter = 0;
+
 	while (length < BWAPI::Broodwar->mapWidth()) //We'll ride the spiral to the end
 	{
+
 		//if we can build here, return this tile position
 		if (x >= 0 && x < BWAPI::Broodwar->mapWidth() && y >= 0 && y < BWAPI::Broodwar->mapHeight())
 		{
+            iter++;
+
+            if (iter % 50 == 0)
+            {
+                if (t.getElapsedTimeInMilliSec() > 30)
+                {
+                    return BWAPI::TilePositions::None;
+                }
+            }
+
 			// can we build this building at this location
 			bool canBuild					= this->canBuildHereWithSpace(BWAPI::TilePosition(x, y), b, buildDist, horizontalOnly);
 

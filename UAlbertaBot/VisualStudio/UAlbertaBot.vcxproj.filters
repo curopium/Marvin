@@ -150,10 +150,19 @@
     <ClCompile Include="..\Source\Logger.cpp">
       <Filter>game\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Visualizer.cpp">
-      <Filter>extra</Filter>
+    <ClCompile Include="..\Source\base\BuildLearner.cpp">
+      <Filter>game\macro\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\UnitCommandManager.cpp">
+      <Filter>game\util\info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\UnitCommandData.cpp">
+      <Filter>game\util\info</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\ReplayVisualizer.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Visualizer.cpp">
       <Filter>extra</Filter>
     </ClCompile>
   </ItemGroup>
@@ -272,10 +281,19 @@
     <ClInclude Include="..\Source\Logger.h">
       <Filter>game\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Visualizer.h">
-      <Filter>extra</Filter>
+    <ClInclude Include="..\Source\base\BuildLearner.h">
+      <Filter>game\macro\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\UnitCommandManager.h">
+      <Filter>game\util\info</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\UnitCommandData.h">
+      <Filter>game\util\info</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\ReplayVisualizer.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Visualizer.h">
       <Filter>extra</Filter>
     </ClInclude>
   </ItemGroup>

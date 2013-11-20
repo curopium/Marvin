@@ -28,6 +28,7 @@ void UnitData::updateUnit(BWAPI::Unit * unit)
 		ui.lastHealth = unit->getHitPoints() + unit->getShields();
 		ui.unitID = unit->getID();
 		ui.type = unit->getType();
+        ui.completed = unit->isCompleted();
 
 		return;
 	}

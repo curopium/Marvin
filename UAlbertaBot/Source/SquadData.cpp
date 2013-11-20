@@ -13,6 +13,20 @@ void SquadData::update()
 
 void SquadData::clearSquadData()
 {
+    // give back workers who were in squads
+    BOOST_FOREACH (Squad & squad, squads)
+	{
+        const UnitVector & units = squad.getUnits();
+
+        for (size_t u(0); u<units.size(); ++u)
+        {
+            if (units[u]->getType().isWorker())
+            {
+                WorkerManager::Instance().finishedWithWorker(units[u]);
+            }
+        }
+	}
+
 	squads.clear();
 }
 

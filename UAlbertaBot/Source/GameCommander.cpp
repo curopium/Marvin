@@ -29,11 +29,17 @@ void GameCommander::update()
 
 	// combat and scouting managers
 	timerManager.startTimer(TimerManager::Combat);
-	combatCommander.update(combatUnits);
+	if (Options::Modules::USING_COMBATCOMMANDER)
+	{
+		combatCommander.update(combatUnits);
+	}
 	timerManager.stopTimer(TimerManager::Combat);
 
 	timerManager.startTimer(TimerManager::Scout);
-	scoutManager.update(scoutUnits);
+	if (Options::Modules::USING_SCOUTMANAGER)
+	{
+		scoutManager.update(scoutUnits);
+	}
 	timerManager.stopTimer(TimerManager::Scout);
 
 	// utility managers
@@ -62,7 +68,7 @@ void GameCommander::drawDebugInterface()
 {
 	timerManager.displayTimers(490, 225);
 	
-	//StarcraftBuildOrderSearchManager::Instance().drawSearchInformation(10, 240);
+	StarcraftBuildOrderSearchManager::Instance().drawSearchInformation(10, 240);
 	//BuildingManager::Instance().drawBuildingInformation(200,50);
 	ProductionManager::Instance().drawProductionInformation(10, 30);
 	InformationManager::Instance().drawUnitInformation(425,30);
@@ -158,7 +164,8 @@ void GameCommander::setCombatUnits()
 
 	// emergency situation, enemy is in our base and we have no combat units
 	// add our workers to the combat force
-	if (combatUnits.empty() && StrategyManager::Instance().defendWithWorkers())
+    int workersToDefend = StrategyManager::Instance().defendWithWorkers();
+	if (combatUnits.empty() && (workersToDefend > 0))
 	{
 		BOOST_FOREACH (BWAPI::Unit * unit, validUnits)
 		{
@@ -170,7 +177,13 @@ void GameCommander::setCombatUnits()
 				{
 					combatUnits.insert(unit);
 					assignedUnits.insert(unit);
+                    workersToDefend--;
 				}
+
+                if (workersToDefend <= 0)
+                {
+                    break;
+                }
 			}
 		}
 	}
@@ -296,20 +309,6 @@ void GameCommander::onUnitMorph(BWAPI::Unit * unit)
 { 
 	InformationManager::Instance().onUnitMorph(unit);
 	WorkerManager::Instance().onUnitMorph(unit);
-}
-
-void GameCommander::onSendText(std::string text)
-{
-	ProductionManager::Instance().onSendText(text);
-
-	if (text.compare("0") == 0)
-	{
-		BWAPI::Broodwar->setLocalSpeed(0);
-	}
-	else if (atoi(text.c_str()) > 0)
-	{
-		BWAPI::Broodwar->setLocalSpeed(atoi(text.c_str()));
-	}
 }
 
 BWAPI::Unit * GameCommander::getClosestUnitToTarget(BWAPI::UnitType type, BWAPI::Position target)

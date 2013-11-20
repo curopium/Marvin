@@ -43,6 +43,9 @@ private:
 	std::map<BWAPI::Unit *, int>					depotWorkerCount;
 	std::map<BWAPI::Unit *, int>					refineryWorkerCount;
 
+    std::map<BWAPI::Unit *, int>					workersOnMineralPatch;
+    std::map<BWAPI::Unit *, BWAPI::Unit *>			workerMineralAssignment;
+
 	void											clearPreviousJob(BWAPI::Unit * unit);
 
 public:
@@ -83,7 +86,10 @@ public:
 	BWAPI::UnitType			getWorkerBuildingType(BWAPI::Unit * unit);
 	WorkerMoveData			getWorkerMoveData(BWAPI::Unit * unit);
 
+    std::vector<BWAPI::Unit *> getMineralPatchesNearDepot(BWAPI::Unit * depot);
+    void                    addToMineralPatch(BWAPI::Unit * unit, int num);
 	void					drawDepotDebugInfo();
 
 	const std::set<BWAPI::Unit *> & getWorkers() const { return workers; }
+
 };

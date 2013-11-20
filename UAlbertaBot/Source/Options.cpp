@@ -2,15 +2,125 @@
 
 namespace Options
 {
-	namespace Modules							// toggle various modules of UAlbertaBot, must be const
+
+	namespace Modules							    // toggle various modules of UAlbertaBot, must be const
 	{
-		const bool USING_GAMECOMMANDER			= true;	// toggle GameCommander, effectively UAlbertaBot
-		const bool USING_ENHANCED_INTERFACE		= false;	// toggle EnhancedUI, not needed for UAlbertaBot
-		const bool USING_REPLAY_VISUALIZER		= false;		// cannot be on while gamecommander is on
-		const bool USING_MICRO_SEARCH			= false;	// toggle use of Micro Search, if false script used
-		const bool USING_MACRO_SEARCH			= true;		// toggle use of Build Order Search, currently no backup
-		const bool USING_STRATEGY_IO			= false;		// toggle the use of file io for strategy
+        // the default tournament bot modules
+		bool USING_GAMECOMMANDER		= true;	    // toggle GameCommander, effectively UAlbertaBot
+		bool USING_SCOUTMANAGER			= true;
+		bool USING_COMBATCOMMANDER		= true;
+		bool USING_MACRO_SEARCH			= true;	    // toggle use of Build Order Search, currently no backup
+		bool USING_STRATEGY_IO			= false;	// toggle the use of file io for strategy
+        bool USING_UNIT_COMMAND_MGR		= true;     // handles all unit commands
+		
+        // extra things, don't enable unless you know what they are
+        bool USING_REPLAY_VISUALIZER	= false;	// cannot be on while gamecommander is on
+        bool USING_MICRO_SEARCH			= false;	// toggle use of Micro Search, if false script used
+        bool USING_BUILD_LEARNER		= false;	// toggle the use of build learning, must not be using macro search
+        bool USING_ENHANCED_INTERFACE	= false;	// toggle EnhancedUI, not needed for UAlbertaBot
+		bool USING_BUILD_ORDER_DEMO		= false;
+
+		void checkOptions()									// checks to see if options are set in a sane manner
+		{
+			if (USING_GAMECOMMANDER)
+			{
+				assert(!USING_ENHANCED_INTERFACE);
+				assert(!USING_MICRO_SEARCH);
+			}
+
+			assert(!(USING_BUILD_LEARNER && USING_MACRO_SEARCH));
+		}
 	}
+
+    
+    namespace BotModes
+    {
+        int CURRENT_BOT_MODE = BotModes::AIIDE_TOURNAMENT;
+
+        void SetBotMode(int mode)
+        {
+            if (mode < BotModes::NUM_MODES)
+            {
+                CURRENT_BOT_MODE = mode;
+            }
+            else
+            {
+                exit(0);
+            }
+
+            if (mode == BotModes::AIIDE_TOURNAMENT)
+            {
+                Modules::USING_GAMECOMMANDER		= true;	
+				Modules::USING_SCOUTMANAGER			= true;	
+				Modules::USING_COMBATCOMMANDER		= true;
+		        Modules::USING_MACRO_SEARCH			= true;	
+		        Modules::USING_STRATEGY_IO			= false;
+                Modules::USING_UNIT_COMMAND_MGR		= true; 
+		
+                Modules::USING_REPLAY_VISUALIZER	= false;
+                Modules::USING_MICRO_SEARCH			= false;
+                Modules::USING_BUILD_LEARNER		= false;
+                Modules::USING_ENHANCED_INTERFACE	= false;
+            }
+            else if (mode == BotModes::CIG_TOURNAMENT)
+            {
+                Modules::USING_GAMECOMMANDER		= true;	
+				Modules::USING_SCOUTMANAGER			= true;	
+				Modules::USING_COMBATCOMMANDER		= true;
+		        Modules::USING_MACRO_SEARCH			= true;	
+		        Modules::USING_STRATEGY_IO			= false;
+                Modules::USING_UNIT_COMMAND_MGR		= true; 
+		
+                Modules::USING_REPLAY_VISUALIZER	= false;
+                Modules::USING_MICRO_SEARCH			= false;
+                Modules::USING_BUILD_LEARNER		= false;
+                Modules::USING_ENHANCED_INTERFACE	= false;
+            }
+            else if (mode == BotModes::MICRO_SEARCH_TEST)
+            {
+                Modules::USING_GAMECOMMANDER		= false;	
+				Modules::USING_SCOUTMANAGER			= false;	
+				Modules::USING_COMBATCOMMANDER		= false;
+		        Modules::USING_MACRO_SEARCH			= false;	
+		        Modules::USING_STRATEGY_IO			= false;
+                Modules::USING_UNIT_COMMAND_MGR		= true; 
+		
+                Modules::USING_REPLAY_VISUALIZER	= false;
+                Modules::USING_MICRO_SEARCH			= true;
+                Modules::USING_BUILD_LEARNER		= false;
+                Modules::USING_ENHANCED_INTERFACE	= false;
+            }
+            else if (mode == BotModes::REPLAY_VIS_TEST)
+            {
+                Modules::USING_GAMECOMMANDER		= false;	
+				Modules::USING_SCOUTMANAGER			= false;	
+				Modules::USING_COMBATCOMMANDER		= false;
+		        Modules::USING_MACRO_SEARCH			= false;	
+		        Modules::USING_STRATEGY_IO			= false;
+                Modules::USING_UNIT_COMMAND_MGR		= false; 
+		
+                Modules::USING_REPLAY_VISUALIZER	= true;
+                Modules::USING_MICRO_SEARCH			= false;
+                Modules::USING_BUILD_LEARNER		= false;
+                Modules::USING_ENHANCED_INTERFACE	= false;
+            }
+			else if (mode == BotModes::BUILD_ORDER_DEMO)
+            {
+                Modules::USING_GAMECOMMANDER		= true;	
+				Modules::USING_SCOUTMANAGER			= false;	
+				Modules::USING_COMBATCOMMANDER		= false;
+		        Modules::USING_MACRO_SEARCH			= true;	
+		        Modules::USING_STRATEGY_IO			= false;
+                Modules::USING_UNIT_COMMAND_MGR		= true; 
+		
+                Modules::USING_REPLAY_VISUALIZER	= false;
+                Modules::USING_MICRO_SEARCH			= false;
+                Modules::USING_BUILD_LEARNER		= false;
+                Modules::USING_ENHANCED_INTERFACE	= false;
+				Modules::USING_BUILD_ORDER_DEMO		= true;
+            }
+        }
+    }
 
 	namespace Tournament						// settings for the AIIDE tournament
 	{

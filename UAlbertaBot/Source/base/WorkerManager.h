@@ -11,6 +11,7 @@ class WorkerManager {
 	//static WorkerManager *		instance;
 
 	WorkerData					workerData;
+    BWAPI::Unit *               previousClosestWorker;
 
 	int							workersPerRefinery;
 
@@ -51,6 +52,7 @@ public:
 	BWAPI::Unit *				getClosestDepot(BWAPI::Unit * worker);
 	BWAPI::Unit *				getGasWorker(BWAPI::Unit * refinery);
 	BWAPI::Unit *				getClosestEnemyUnit(BWAPI::Unit * worker);
+    BWAPI::Unit *               getClosestMineralWorkerTo(BWAPI::Unit * enemyUnit);
 
 	void						setMoveWorker(int m, int g, BWAPI::Position p);
 	void						setCombatWorker(BWAPI::Unit * worker);

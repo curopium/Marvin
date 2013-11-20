@@ -16,10 +16,8 @@ MapTools::MapTools()
 	map			= std::vector<bool>(rows*cols, false);
 	units		= std::vector<bool>(rows*cols, false);
 	fringe		= std::vector<int> (rows*cols, 0);
-	connected	= std::vector<int> (rows*cols, -1);
 
 	setBWAPIMapData();
-	computeConnectedRegions();
 }
 
 // return the index of the 1D array from (row,col)
@@ -33,16 +31,10 @@ bool MapTools::unexplored(DistanceMap & dmap, const int index) const
 	return (index != -1) && dmap[index] == -1 && map[index];
 }
 
-bool MapTools::unconnected(const int index) const
-{
-	return (index != -1) && connected[index] == -1 && map[index];
-}
-
 // resets the distance and fringe vectors, call before each search
 void MapTools::reset()
 {
 	std::fill(fringe.begin(), fringe.end(), 0);
-	std::fill(connected.begin(), connected.end(), -1);
 }
 
 // reads in the map data from bwapi and stores it in our map format
@@ -106,7 +98,6 @@ void MapTools::update()
 		}
 	}*/
 
-
 	BOOST_FOREACH (BWAPI::Unit * unit, BWAPI::Broodwar->getAllUnits())
 	{
 		BWAPI::Color c(BWAPI::Colors::Yellow);
@@ -154,29 +145,12 @@ void MapTools::drawMyRegion()
 	}
 }
 
-void MapTools::computeConnectedRegions()
-{
-	int size = rows*cols;
-
-	int region = 0;
-	 
-	// for each spot on the map
-	for (int i(0); i < size; ++i)
-	{
-		// if this index is unconnected
-		if (unconnected(i))
-		{
-			fill(i, region++);
-		}
-	}
-}
-
 int MapTools::getGroundDistance(BWAPI::Position origin, BWAPI::Position destination)
 {
 	// if we haven't yet computed the distance map to the destination
 	if (allMaps.find(destination) == allMaps.end())
 	{
-		BWAPI::Broodwar->printf("Computing DistanceMap for new destination");
+		//BWAPI::Broodwar->printf("Computing DistanceMap for new destination");
 
 		// add the map and compute it
 		allMaps[destination] = DistanceMap();
@@ -274,73 +248,6 @@ void MapTools::search(DistanceMap & dmap, const int sR, const int sC)
 	}
 }
 
-// computes connectivity for the map
-void MapTools::fill(const int index, const int region)
-{
-	// reset the internal variables
-	resetFringe();
-	
-	// set the fringe variables accordingly
-	int fringeSize(1);
-	int fringeIndex(0);
-	fringe[0] = index;
-	
-	// temporary variables used in search loop
-	int currentIndex, nextIndex;
-	
-	int size = rows*cols;
-	
-	// while we still have things left to expand
-	while (fringeIndex < fringeSize)
-	{
-		// grab the current index to expand from the fringe
-		currentIndex = fringe[fringeIndex++];
-		
-		// search up
-		nextIndex = (currentIndex > cols) ? (currentIndex - cols) : -1;
-		if (unconnected(nextIndex))
-		{
-			// set the distance based on distance to current cell
-			connected[nextIndex] = region;
-				
-			// put it in the fringe
-			fringe[fringeSize++] = nextIndex;
-		}
-		
-		// search down
-		nextIndex = (currentIndex + cols < size) ? (currentIndex + cols) : -1;
-		if (unconnected(nextIndex))
-		{
-			// set the distance based on distance to current cell
-			connected[nextIndex] = region;
-				
-			// put it in the fringe
-			fringe[fringeSize++] = nextIndex;
-		}
-		
-		// search left
-		nextIndex = (currentIndex % cols > 0) ? (currentIndex - 1) : -1;
-		if (unconnected(nextIndex))
-		{
-			// set the distance based on distance to current cell
-			connected[nextIndex] = region;
-				
-			// put it in the fringe
-			fringe[fringeSize++] = nextIndex;
-		}
-		
-		// search right
-		nextIndex = (currentIndex % cols < cols - 1) ? (currentIndex + 1) : -1;
-		if (unconnected(nextIndex))
-		{
-			// set the distance based on distance to current cell
-			connected[nextIndex] = region;
-				
-			// put it in the fringe
-			fringe[fringeSize++] = nextIndex;
-		}
-	}
-}
 
 int MapTools::getEnemyBaseDistance(BWAPI::Position p)
 {

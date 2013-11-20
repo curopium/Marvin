@@ -56,11 +56,6 @@ class StrategyManager
 	const	std::string			getProtossDragoonsOpeningBook() const;
 	const	MetaPairVector		getProtossDragoonsBuildOrderGoal() const;
 
-	// Zerg Strategy
-	const	bool				expandZerg() const;
-	const   MetaPairVector      getZergBuildOrderGoal2() const;
-	const   MetaPairVector      getZergBuildOrderGoal3() const;
-
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
 
@@ -80,13 +75,11 @@ public:
 	
 	const	bool				regroup(int numInRadius);
 	const	bool				doAttack(const std::set<BWAPI::Unit *> & freeUnits);
-	const	bool				defendWithWorkers();
+	const	int				    defendWithWorkers();
 	const	bool				rushDetected();
 
 	const	int					getCurrentStrategy();
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
-
-	
 };

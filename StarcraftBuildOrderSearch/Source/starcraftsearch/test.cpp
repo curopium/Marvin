@@ -58,13 +58,13 @@ StarcraftState openingBookStateProtoss()
 	Action pylon = DATA.getSupplyProvider();
 	//Action gateway = DATA.getAction(BWAPI::UnitTypes::Protoss_Gateway);
 	
-	state.doAction(probe, state.resourcesReady(probe));
-	state.doAction(probe, state.resourcesReady(probe));
-	state.doAction(probe, state.resourcesReady(probe));
-	state.doAction(probe, state.resourcesReady(probe));
-	state.doAction(pylon, state.resourcesReady(pylon));
-	state.doAction(probe, state.resourcesReady(probe));
-	state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(pylon, state.resourcesReady(pylon));
+	//state.doAction(probe, state.resourcesReady(probe));
+	//state.doAction(probe, state.resourcesReady(probe));
 	
 	return state;
 }
@@ -77,7 +77,7 @@ void testArmySearch()
 	SearchParameters params;
 //	params.initialState = openingBookStateGateway();
 	params.initialState = StarcraftState(true);
-	params.initialUpperBound = 6000;
+	params.initialUpperBound = 5000;
 	params.goal = defaultProtossGoal();
 	params.useAlwaysMakeWorkers = true;
 	params.useIncreasingRepetitions = true;

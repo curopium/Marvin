@@ -43,7 +43,7 @@ void MeleeManager::executeMicro(const UnitVector & targets)
 				if (meleeUnit->getDistance(order.position) > 100)
 				{
 					// move to it
-					smartAttackMove(meleeUnit, order.position);
+					smartMove(meleeUnit, order.position);
 				}
 			}
 		}

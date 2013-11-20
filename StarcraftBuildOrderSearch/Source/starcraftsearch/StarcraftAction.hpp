@@ -92,13 +92,11 @@ public:
 		, canAttackBool(t.canAttack())
 		, whatBuildsUnitType(t.whatBuilds().first)
 	{
-		/*
 		if (t == BWAPI::UnitTypes::Zerg_Zergling || t == BWAPI::UnitTypes::Zerg_Scourge)
 		{
 			numberProduced = 2;
 		}
-		*/
-
+		
 		std::stringstream ss("");
 		ss << repeat << " " << name;
 		metaName = ss.str();

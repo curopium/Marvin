@@ -197,9 +197,7 @@ private:
 				if (GSN_DEBUG) printf("\t\tZerg Building - Remove Drone\n");
 
 				// special case of morphed buildings
-				if (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire ||
-					DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony ||
-					DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony )
+				if (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair || DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire)
 				{
 					// the previous building starts morphing into this one
 				}
@@ -284,32 +282,11 @@ private:
 				maxSupply -= DATA[DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery)].supplyProvided();
 			}
 
-			// if it's a Hive, remove the lair
-			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive))
-			{
-				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Lair)]--;
-
-				// take away the supply that was provided by the hatchery
-				maxSupply -= DATA[DATA.getAction(BWAPI::UnitTypes::Zerg_Lair)].supplyProvided();
-			}
-
 			// if it's a Greater Spire, remove the spire
-			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
-			{
-				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spire)]--;
-			}
-
-			// if it's a Sunken colony, remove the Creep colony
-			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony))
-			{
-				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony)]--;
-			}
-
-			// if it's a Spore colony, remove the Creep colony
-			if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony))
-			{
-				numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony)]--;
-			}
+			//if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
+			//{
+			///	numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spire)]--;
+			//}
 
 			fixZergUnitMasks();
 		}
@@ -332,27 +309,10 @@ private:
 			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
 		}
 
-		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Hive)] > 0)
-		{
-			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
-			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));
-		}
-
-		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Greater_Spire)] > 0)
-		{
-			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
-		}
-
-		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Sunken_Colony)] > 0)
-		{
-			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
-		}
-
-		if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Spore_Colony)] > 0)
-		{
-			completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
-		}
-
+		//if (numUnits[DATA.getAction(BWAPI::UnitTypes::Zerg_Greater_Spire)] > 0)
+		//{
+		//	completedZergUnits.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
+		//}
 	}
 
 public: 
@@ -1287,6 +1247,23 @@ public:
 		return legal;
 	}
 	
+	ActionSet getAllLegalActions() const
+	{
+		ActionSet legal;
+
+		for (Action i = 0; i < DATA.size(); ++i) 
+		{
+			// if we have the prerequisite units
+			if (isLegal(i)) 
+			{
+				// set the bitmask bit to a 1
+				legal.add(i);
+			}
+		}
+
+		return legal;
+	}
+
 	ActionSet getLegalActionsMonteCarlo(const StarcraftSearchGoal & goal) const
 	{
 		// initially empty bitmask
@@ -1412,6 +1389,79 @@ public:
 		#ifdef DEBUG_LEGAL
 			printf("Action Legal %d\n", a);
 		#endif
+		return true;
+	}
+
+	bool isLegal(const Action a) const
+	{
+		// check if the tech requirements are met
+		if (!hasRequirements(DATA[a].getPrerequisites())) 
+		{
+			return false;
+		}
+
+		// if it's a unit and we are out of supply and aren't making an overlord, it's not legal
+		int supplyInProgress = progress[DATA.getSupplyProvider()]*DATA[DATA.getSupplyProvider()].supplyProvided() +
+							   progress[DATA.getResourceDepot()]*DATA[DATA.getResourceDepot()].supplyProvided();
+		if ( (currentSupply + DATA[a].supplyRequired()) > maxSupply + supplyInProgress) 
+		{
+			return false;
+		}
+
+		// specific rule for never leaving 0 workers on minerals
+		if (DATA[a].isRefinery() && (mineralWorkers <= 4 + 3*getNumUnits(DATA.getRefinery()))) 
+		{		
+			return false;
+		}
+
+		// if it's a new building and no drones are available, it's not legal
+		if (DATA[a].isBuilding() && (mineralWorkers <= 1)) 
+		{
+			return false;
+		}
+		
+		// we can't build a building with our last worker
+		if (DATA[a].isBuilding() && (mineralWorkers <= 1 + 3*getNumUnits(DATA.getRefinery())))
+		{
+			return false;
+		}
+
+		// if we have no gas income we can't make a gas unit
+		bool noGas = (gasWorkers == 0) && (getNumUnits(DATA.getRefinery()) == 0);
+		if (((DATA[a].gasPrice() - gas) > 0) && noGas) 
+		{ 
+			return false; 
+		}
+
+		// if we have no mineral income we'll never have a minerla unit
+		bool noMoney = (mineralWorkers == 0) && (progress.numInProgress(DATA.getWorker()) == 0);
+		if (((DATA[a].mineralPrice() - minerals) > 0) && noMoney) 
+		{ 
+			return false; 
+		}
+
+		// don't build more refineries than resource depots
+		if (DATA[a].isRefinery() && (getNumUnits(DATA.getRefinery()) >= getNumUnits(DATA.getResourceDepot())))
+		{
+			return false;
+		}
+
+		// we don't need to go over the maximum supply limit with supply providers
+		if (DATA[a].isSupplyProvider() && (maxSupply + getSupplyInProgress() >= 400))
+		{
+			return false;
+		}
+
+		if (DATA[a].isResourceDepot())
+		{
+			return false;
+		}
+
+		if (DATA[a].isRefinery())
+		{
+			return false;
+		}
+
 		return true;
 	}
 
@@ -1678,7 +1728,6 @@ public:
 				// special cases for zerg trickle down prerequisites
 				if (DATA.getRace() == BWAPI::Races::Zerg)
 				{
-
 					// if it's a Lair, remove the hatchery
 					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Lair))
 					{
@@ -1686,26 +1735,10 @@ public:
 					}
 
 					// if it's a Greater Spire, remove the spire
-					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
-					{
-						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
-					}
-					// if its a hive, remove the lair
-					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Hive))
-					{
-						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Lair));
-						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Hatchery));				
-					}
-					// if spore or sunken colony, remove creep colony
-					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Sunken_Colony))
-					{
-						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
-					}
-
-					if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Spore_Colony))
-					{
-						completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Creep_Colony));
-					}
+					//if (DATA[a].isBuilding() && (DATA[a].getUnitType() == BWAPI::UnitTypes::Zerg_Greater_Spire))
+					//{
+					//	completedUnitSet.add(DATA.getAction(BWAPI::UnitTypes::Zerg_Spire));
+					//}
 				}
 			}
 		}
