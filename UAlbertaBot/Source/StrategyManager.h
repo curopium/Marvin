@@ -61,7 +61,10 @@ class StrategyManager
 
 	const	MetaPairVector		getProtossOpeningBook() const;
 	const	MetaPairVector		getTerranOpeningBook() const;
+
+	//Zerg strategerys
 	const	MetaPairVector		getZergOpeningBook() const;
+	const   bool				expandZerg() const;
 
 public:
 

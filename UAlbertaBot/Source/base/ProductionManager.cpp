@@ -83,22 +83,26 @@ void ProductionManager::update()
 	//// detect if there's a build order deadlock once per second
 	if ((BWAPI::Broodwar->getFrameCount() % 24 == 0) && detectBuildOrderDeadlock())
 	{
-		BWAPI::Broodwar->printf("Supply deadlock detected, building pylon!");
+		BWAPI::Broodwar->printf("Supply deadlock detected, building Supply Providing Unit!");
 		queue.queueAsHighestPriority(MetaType(BWAPI::Broodwar->self()->getRace().getSupplyProvider()), true);
 	}
 
 	// if they have cloaked units get a new goal asap
 	if (!enemyCloakedDetected && InformationManager::Instance().enemyHasCloakedUnits())
 	{
-		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
+		//makes Ai's reaction to cloaked units race specific
+		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
 		{
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
-		}
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2)
+			{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Photon_Cannon), true);
+			}
 
-		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
-		{
-			queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Forge) == 0)
+			{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
+			}
 		}
 
 		BWAPI::Broodwar->printf("Enemy Cloaked Unit Detected!");
