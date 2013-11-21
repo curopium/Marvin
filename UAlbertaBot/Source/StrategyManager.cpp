@@ -35,6 +35,7 @@ void StrategyManager::addStrategies()
 	zergOpeningBook[ZergZerglingRush]		= "3 0 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
+	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 5 12 6 7 16 9 17 9 17 9 17";
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -204,7 +205,8 @@ void StrategyManager::setStrategy()
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
 			//currentStrategy = ZergZerglingRush;
-			currentStrategy = ZergMultaRush;
+			//currentStrategy = ZergMultaRush;
+			currentStrategy = ZergLurkerRush;
 		}
 		//if cant find any, just pick the first
 		else
