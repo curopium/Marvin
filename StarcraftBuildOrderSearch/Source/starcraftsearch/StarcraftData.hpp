@@ -113,6 +113,10 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Mutalisk, actions.size()));					// 10
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Pneumatized_Carapace, actions.size()));			// 11
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Metabolic_Boost, actions.size()));		     	// 12
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Evolution_Chamber, actions.size()));		    // 13
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Queens_Nest, actions.size()));		            // 14
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Hive, actions.size()));		                // 15
+
 		}	
 	}
 
