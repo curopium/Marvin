@@ -105,6 +105,27 @@ void ProductionManager::update()
 			}
 		}
 
+		//get overloard speed iff cloaked units found
+		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
+		{
+
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair) == 1)
+			{
+				if (BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Pneumatized_Carapace == 0))
+				{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UpgradeTypes::Pneumatized_Carapace), true);
+				//queue.queueItem();
+				}
+			}
+			else
+			{
+				queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Zerg_Lair), true);
+				queue.queueAsHighestPriority(MetaType(BWAPI::UpgradeTypes::Pneumatized_Carapace), true);
+		
+			}
+			
+		}
+
 		BWAPI::Broodwar->printf("Enemy Cloaked Unit Detected!");
 		enemyCloakedDetected = true;
 	}

@@ -32,7 +32,8 @@ void StrategyManager::addStrategies()
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
-	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4";
+	zergOpeningBook[ZergZerglingRush]		= "3 0 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6 ";
+	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10 10 10 10 ";
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -71,6 +72,7 @@ void StrategyManager::addStrategies()
 	{
 		results = std::vector<IntPair>(NumZergStrategies);
 		usableStrategies.push_back(ZergZerglingRush);
+		usableStrategies.push_back(ZergMultaRush);
 	}
 
 	if (Options::Modules::USING_STRATEGY_IO)
@@ -181,18 +183,32 @@ void StrategyManager::setStrategy()
 	}
 	else
 	{
-		// otherwise return a random strategy
-
-        std::string enemyName(BWAPI::Broodwar->enemy()->getName());
+		// otherwise return a random strategy (for protoss)
+		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
+		{
+			std::string enemyName(BWAPI::Broodwar->enemy()->getName());
         
-        if (enemyName.compare("Skynet") == 0)
-        {
-            currentStrategy = ProtossDarkTemplar;
-        }
-        else
-        {
-            currentStrategy = ProtossZealotRush;
-        }
+			 if (enemyName.compare("Skynet") == 0)
+			 {
+				 currentStrategy = ProtossDarkTemplar;
+			 }
+			  else
+			 {
+				 currentStrategy = ProtossZealotRush;
+			 }
+
+		}
+
+		//if your zerg
+		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
+		{
+			currentStrategy = 0;
+		}
+		//if cant find any, just pick the first
+		else
+		{
+			currentStrategy = 0;
+		}
 	}
 
 }
@@ -402,9 +418,22 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 	{
 		return getTerranBuildOrderGoal();
 	}
+	//else if zerg
 	else
 	{
-		return getZergBuildOrderGoal();
+		if(getCurrentStrategy() == ZergZerglingRush)
+		{
+			return getZergZerglingBuildOrderGoal();
+			//return getZergmutaliskBuildOrderGoal();
+		}
+
+		else if(getCurrentStrategy() == ZergMultaRush)
+		{
+			return getZergmutaliskBuildOrderGoal();
+			//return getZergZerglingBuildOrderGoal();
+		}
+		// if something goes wrong, use zergling goal
+		return getZergZerglingBuildOrderGoal();
 	}
 }
 
@@ -694,7 +723,7 @@ const bool StrategyManager::expandZerg() const
 }
 
 
-const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
+const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 {
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
@@ -707,6 +736,28 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	int hydrasWanted = numHydras + 6;
 	int ZerglingsWanted = numZerglings +6;
 
+	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
+
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
+
+	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
+}
+
+const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
+{
+	// the goal to return
+	std::vector< std::pair<MetaType, UnitCountType> > goal;
+	
+	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+
+	int mutasWanted = numMutas + 4;
+	int hydrasWanted = numHydras + 6;
+	int ZerglingsWanted = numZerglings +6;
+
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
 
