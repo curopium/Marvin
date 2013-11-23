@@ -35,7 +35,7 @@ void StrategyManager::addStrategies()
 	zergOpeningBook[ZergZerglingRush]		= "3 0 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
-	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 5 12 6 7 16 9 17 9 17 9 17";
+	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 5 12 6 7 16 4 4 4 9 17 9 17 9 17";
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -204,9 +204,9 @@ void StrategyManager::setStrategy()
 		//if your zerg
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
-			//currentStrategy = ZergZerglingRush;
+			currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
-			currentStrategy = ZergLurkerRush;
+			//currentStrategy = ZergLurkerRush;
 		}
 		//if cant find any, just pick the first
 		else
@@ -747,6 +747,21 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 	int mutasWanted = numMutas + 6;
 	int hydrasWanted = numHydras + 6;
 	int ZerglingsWanted = numZerglings +6;
+
+
+	if (InformationManager::Instance().enemyHasCloakedUnits())
+	{
+		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
+		{
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+		}
+		else 
+		{
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+		}
+	}
+
 
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
