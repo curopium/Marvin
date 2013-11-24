@@ -79,6 +79,12 @@ const SparCraft::Unit CombatSimulation::getSparCraftUnit(const UnitInfo & ui) co
 		type = BWAPI::UnitTypes::Terran_Marine;
 	}
 
+	// this is another hack, treat bunkers as a battlecruiser for now
+	if (type == BWAPI::UnitTypes::Terran_Bunker)
+	{
+		type = BWAPI::UnitTypes::Terran_Battlecruiser;
+	}
+
     return SparCraft::Unit( ui.type, 
                             SparCraft::Position(ui.lastPosition), 
                             ui.unitID, 

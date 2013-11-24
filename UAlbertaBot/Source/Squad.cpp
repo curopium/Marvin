@@ -144,7 +144,7 @@ void Squad::setManagerUnits()
 	meleeManager.setUnits(meleeUnits);
 	rangedManager.setUnits(rangedUnits);
 	detectorManager.setUnits(detectorUnits);
-	transportManager.setUnits(detectorUnits);
+	transportManager.setUnits(transportUnits);
 }
 
 // calculates whether or not to regroup

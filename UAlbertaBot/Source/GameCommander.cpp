@@ -207,6 +207,13 @@ bool GameCommander::isCombatUnit(BWAPI::Unit * unit) const
 	{
 		return true;
 	}
+
+	//considers overlords as detectors
+	//if (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord)
+	//{
+	//	return true;
+	//}
+
 		
 	return false;
 }

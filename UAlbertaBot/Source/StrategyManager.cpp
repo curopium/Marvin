@@ -691,6 +691,7 @@ const bool StrategyManager::expandZerg() const
 	int frame =					BWAPI::Broodwar->getFrameCount();
 	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 	int numHydralisk  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numZergling   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
 
 	// if there are more than 10 idle workers, expand
 	if (WorkerManager::Instance().getNumIdleWorkers() > 10)
@@ -701,7 +702,7 @@ const bool StrategyManager::expandZerg() const
 	// 2nd Nexus Conditions:
 	//		We have 12 or more hydralisks
 	//		It is past frame 7000
-	if ((numHatchery < 2) && (numHydralisk > 12 || frame > 9000))
+	if ((numHatchery < 2) && (numZergling > 12 || frame > 9000))
 	{
 		return true;
 	}
@@ -709,22 +710,22 @@ const bool StrategyManager::expandZerg() const
 	// 3nd Nexus Conditions:
 	//		We have 24 or more hydralisks
 	//		It is past frame 12000
-	if ((numHatchery < 3) && (numHydralisk > 24 || frame > 15000))
+	if ((numHatchery < 3) && (numZergling > 24 || frame > 15000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 4) && (numHydralisk > 24 || frame > 21000))
+	if ((numHatchery < 4) && (numZergling > 24 || frame > 21000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 5) && (numHydralisk > 24 || frame > 26000))
+	if ((numHatchery < 5) && (numZergling > 24 || frame > 26000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 6) && (numHydralisk > 24 || frame > 30000))
+	if ((numHatchery < 6) && (numZergling > 24 || frame > 30000))
 	{
 		return true;
 	}
@@ -743,6 +744,7 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 
 	int mutasWanted = numMutas + 6;
 	int hydrasWanted = numHydras + 6;
@@ -760,6 +762,11 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
 		}
+	}
+
+	if (expandZerg())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
 	}
 
 
