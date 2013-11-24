@@ -30,6 +30,15 @@ void RangedManager::executeMicro(const UnitVector & targets)
 			// if there are targets
 			if (!rangedUnitTargets.empty())
 			{
+
+				if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+				{
+					if( rangedUnit->isBurrowed() == 0 )
+					{
+						rangedUnit->burrow();
+					}
+				}
+
 				// find the best target for this zealot
 				BWAPI::Unit * target = getTarget(rangedUnit, rangedUnitTargets);
 
@@ -39,6 +48,15 @@ void RangedManager::executeMicro(const UnitVector & targets)
 			// if there are no targets
 			else
 			{
+
+				if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+				{
+					if( rangedUnit->isBurrowed() == 1 )
+					{
+						rangedUnit->unburrow();
+					}
+				}
+
 				// if we're not near the order position
 				if (rangedUnit->getDistance(order.position) > 100)
 				{

@@ -204,9 +204,9 @@ void StrategyManager::setStrategy()
 		//if your zerg
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
-			currentStrategy = ZergZerglingRush;
+			//currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
-			//currentStrategy = ZergLurkerRush;
+			currentStrategy = ZergLurkerRush;
 		}
 		//if cant find any, just pick the first
 		else
@@ -442,8 +442,12 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 			return getZergmutaliskBuildOrderGoal();
 			//return getZergZerglingBuildOrderGoal();
 		}
-		// if something goes wrong, use zergling goal
 
+		else if(getCurrentStrategy() == ZergLurkerRush)
+		// if something goes wrong, use zergling goal
+		{
+			return getZergZerglingBuildOrderGoal();
+		}
 		return getZergZerglingBuildOrderGoal();
 		
 	}
