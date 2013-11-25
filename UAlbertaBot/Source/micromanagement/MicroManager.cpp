@@ -96,6 +96,19 @@ void MicroManager::regroup(const BWAPI::Position & regroupPosition) const
 	// for each of the units we have
 	BOOST_FOREACH (BWAPI::Unit * unit, units)
 	{
+
+		/*
+		//check for burrow
+		if( unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+		{
+			if( unit->isBurrowed() == 1 )
+			{
+				unit->unburrow();
+			}
+		}
+		*/
+
+
 		// if the unit is outside the regroup area
 		if (unit->getDistance(regroupPosition) > 100)
 		{

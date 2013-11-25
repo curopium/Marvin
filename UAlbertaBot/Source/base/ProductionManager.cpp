@@ -69,6 +69,7 @@ void ProductionManager::update()
 
 	if ((queue.size() == 0) && Options::Modules::USING_BUILD_ORDER_DEMO)
 	{
+
 		performBuildOrderSearch(searchGoal);
 	}
 
@@ -86,6 +87,9 @@ void ProductionManager::update()
 		BWAPI::Broodwar->printf("Supply deadlock detected, building Supply Providing Unit!");
 		queue.queueAsHighestPriority(MetaType(BWAPI::Broodwar->self()->getRace().getSupplyProvider()), true);
 	}
+
+
+
 
 	// if they have cloaked units get a new goal asap
 	if (!enemyCloakedDetected && InformationManager::Instance().enemyHasCloakedUnits())
@@ -129,6 +133,16 @@ void ProductionManager::update()
 		BWAPI::Broodwar->printf("Enemy Cloaked Unit Detected!");
 		enemyCloakedDetected = true;
 	}
+
+
+	/*
+	if(queue.size() == 0)
+	{
+		//BWAPI::Broodwar->printf("empty queue");
+		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+		performBuildOrderSearch(newGoal);
+	}
+	*/
 
 
 //	if (Options::Debug::DRAW_UALBERTABOT_DEBUG) BWAPI::Broodwar->drawTextScreen(447, 17, "\x07 %d", BuildingManager::Instance().getReservedMinerals());
@@ -386,7 +400,9 @@ void ProductionManager::createMetaType(BWAPI::Unit * producer, MetaType t)
 	if (t.isUnit() && t.unitType.isBuilding() 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Lair 
 		&& t.unitType != BWAPI::UnitTypes::Zerg_Hive
-		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire)
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Greater_Spire
+		&& t.unitType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+		)
 	{
 		// send the building task to the building manager
 		BuildingManager::Instance().addBuildingTask(t.unitType, BWAPI::Broodwar->self()->getStartLocation());

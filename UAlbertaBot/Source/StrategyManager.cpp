@@ -28,14 +28,15 @@ void StrategyManager::addStrategies()
 	//protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
     protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	//protossOpeningBook[ProtossZealotRush]	= "0";
-	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
+	//protossOpeningBook[ProtossDarkTemplar]= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
-	zergOpeningBook[ZergZerglingRush]		= "3 0 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
+	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
-	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 5 12 6 7 16 4 4 4 9 17 9 17 9 17";
+	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 9 9 9 9 9 16 17 17 17 17 17 4 4 4 4 4 4 19 2 ";
+	//zergOpeningBook[ZergLurkerRush]			= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -768,10 +769,10 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 		}
 	}
 
-	if (expandZerg())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
-	}
+	//if (expandZerg())
+	//{
+	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
+	//}
 
 
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));

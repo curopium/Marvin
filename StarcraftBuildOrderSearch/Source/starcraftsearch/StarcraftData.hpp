@@ -119,7 +119,8 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::TechTypes::Lurker_Aspect, actions.size()));		            // 16
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Lurker, actions.size()));						// 17
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Antennae, actions.size()));						// 18
-
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Creep_Colony, actions.size()));				// 19
+			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Zerg_Sunken_Colony, actions.size()));				// 20
 		}	
 	}
 
