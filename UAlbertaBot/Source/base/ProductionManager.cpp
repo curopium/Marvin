@@ -73,12 +73,41 @@ void ProductionManager::update()
 		performBuildOrderSearch(searchGoal);
 	}
 
-	// if nothing is currently building, get a new goal from the strategy manager
-	if ((queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10) && !Options::Modules::USING_BUILD_ORDER_DEMO)
+
+
+	//no search version for zerg
+	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 	{
-		BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
-		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
-		performBuildOrderSearch(newGoal);
+		if ((queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10) && !Options::Modules::USING_BUILD_ORDER_DEMO)
+		{
+			BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
+			const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+
+			size_t index = 0;
+			//goes through each unit in goal and adds it strait into queue, instead of search
+			while(index < newGoal.size())
+			{
+				const MetaType meta_t;
+				std::pair<MetaType, UnitCountType> meta_pair = newGoal[index];
+				MetaType meta_unit = meta_pair.first;
+				queue.queueAsLowestPriority(meta_unit, true);
+				index = index +1;
+			}
+		}
+	}
+	//for Protoss and terran
+	else
+	{
+		// if nothing is currently building, get a new goal from the strategy manager
+		//search version
+	
+		if ((queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10) && !Options::Modules::USING_BUILD_ORDER_DEMO)
+		{
+			BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
+			const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+			performBuildOrderSearch(newGoal);
+		}
+	
 	}
 
 	//// detect if there's a build order deadlock once per second
@@ -290,6 +319,14 @@ bool ProductionManager::detectBuildOrderDeadlock()
 	{
 		return true;
 	}
+
+	/*
+	if(BWAPI::Broodwar->self()->supplyTotal() == BWAPI::Broodwar->self()->supplyUsed())
+	{
+		if (queue.getHighestPriorityItem() == BWAPI::UnitTypes::Zerg_Overlord)
+		return true;
+	}
+	*/
 
 	return false;
 }
