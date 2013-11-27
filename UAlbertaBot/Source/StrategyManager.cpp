@@ -447,7 +447,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		else if(getCurrentStrategy() == ZergLurkerRush)
 		// if something goes wrong, use zergling goal
 		{
-			return getZergZerglingBuildOrderGoal();
+			return getZergLurkerBuildOrderGoal();
 		}
 		return getZergZerglingBuildOrderGoal();
 		
@@ -760,14 +760,21 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 	{
 		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
 		{
-			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
-			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+			if(BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Pneumatized_Carapace == false))
+			{
+				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
+			}
+			if(BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Antennae == false))
+			{
+				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+			}
 		}
 		else 
 		{
 			goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
 		}
 	}
+
 
 	//if (expandZerg())
 	//{
@@ -801,6 +808,31 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
+
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
+
+	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
+}
+
+const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
+{
+	// the goal to return
+	std::vector< std::pair<MetaType, UnitCountType> > goal;
+	
+	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+
+	int mutasWanted = numMutas + 4;
+	int hydrasWanted = numHydras + 6;
+	int ZerglingsWanted = numZerglings +6;
+
+	//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
+
+
+	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
+	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
 
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));

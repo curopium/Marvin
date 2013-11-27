@@ -75,7 +75,8 @@ void ProductionManager::update()
 
 
 
-	//no search version for zerg
+	//no search version for zerg lurker rush
+	
 	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 	{
 		if ((queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10) && !Options::Modules::USING_BUILD_ORDER_DEMO)
@@ -300,19 +301,35 @@ bool ProductionManager::canMakeNow(BWAPI::Unit * producer, MetaType t)
 
 bool ProductionManager::detectBuildOrderDeadlock()
 {
+
+	bool supplyInProgress = 0;
+
 	// if the queue is empty there is no deadlock
 	if (queue.size() == 0 || BWAPI::Broodwar->self()->supplyTotal() >= 390)
 	{
 		return false;
 	}
 
+	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
+	{
+		bool supplyInProgress = BuildingManager::Instance().isBeingBuilt(BWAPI::UnitTypes::Zerg_Overlord);
+	}
+	else
+	{
 	// are any supply providers being built currently
-	bool supplyInProgress =		BuildingManager::Instance().isBeingBuilt(BWAPI::Broodwar->self()->getRace().getCenter()) || 
-								BuildingManager::Instance().isBeingBuilt(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+		bool supplyInProgress =		BuildingManager::Instance().isBeingBuilt(BWAPI::Broodwar->self()->getRace().getCenter()) || 
+									BuildingManager::Instance().isBeingBuilt(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+	}
 
 	// does the current item being built require more supply
 	int supplyCost			= queue.getHighestPriorityItem().metaType.supplyRequired();
 	int supplyAvailable		= std::max(0, BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
+
+
+	//BWAPI::Broodwar->printf("supply available: %d", supplyAvailable);
+	//BWAPI::Broodwar->printf("supply cost: %d", supplyCost);
+	//BWAPI::Broodwar->printf("supplyinProgress: %d", supplyInProgress);
+
 
 	// if we don't have enough supply and none is being built, there's a deadlock
 	if ((supplyAvailable < supplyCost) && !supplyInProgress)
@@ -320,11 +337,25 @@ bool ProductionManager::detectBuildOrderDeadlock()
 		return true;
 	}
 
+	
+	//zerg overlord builder
 	/*
-	if(BWAPI::Broodwar->self()->supplyTotal() == BWAPI::Broodwar->self()->supplyUsed())
+	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg && !supplyInProgress)
 	{
-		if (queue.getHighestPriorityItem() == BWAPI::UnitTypes::Zerg_Overlord)
-		return true;
+		if(BWAPI::Broodwar->self()->supplyTotal() == BWAPI::Broodwar->self()->supplyUsed())
+		{
+			BuildOrderItem<int> current_build_item = queue.getHighestPriorityItem();
+			MetaType current_meta_type = current_build_item.metaType;
+
+			if ((current_meta_type).unitType == BWAPI::UnitTypes::Zerg_Overlord)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
 	}
 	*/
 

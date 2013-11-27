@@ -118,9 +118,21 @@ void Squad::setManagerUnits()
 	{
 		if(unit->isCompleted() && unit->getHitPoints() > 0 && unit->exists())
 		{
+
+			/*
+			//BWAPI::Broodwar->printf("################ OVERLORD found #################### ");
+
+			if (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord)
+			{
+				BWAPI::Broodwar->printf("################ OVERLORD found #################### ");
+			}
+			*/
+			
+
 			// select dector units
 			if (unit->getType().isDetector() && !unit->getType().isBuilding())
 			{
+
 				detectorUnits.push_back(unit);
 			}
 			// select transport units
