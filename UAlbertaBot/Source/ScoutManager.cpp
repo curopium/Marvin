@@ -1,6 +1,9 @@
 #include "Common.h"
 #include "ScoutManager.h"
 #include "InformationManager.h"
+#include "BWTA.h"
+#include <set>
+#include "base/BuildingPlacer.h"
 
 ScoutManager::ScoutManager() : workerScout(NULL), numWorkerScouts(0), scoutUnderAttack(false)
 {
@@ -60,12 +63,18 @@ void ScoutManager::moveScouts()
 		// if the scout is in the enemy region
 		if (scoutRegion == enemyRegion)
 		{
+			BWAPI::Unit * geyser = getEnemyGeyser();
+			
+			workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
+			//int thing = static_cast<std::string>(workerScout->getLastCommand());
+			BWAPI::Broodwar->printf("%d", workerScout->getLastCommand().getType().getID());
 			std::vector<GroundThreat> groundThreats;
 			fillGroundThreats(groundThreats, workerScout->getPosition());
 
 			// get the closest enemy worker
 			BWAPI::Unit * closestWorker = closestEnemyWorker();
-
+			
+			/*
 			// if the worker scout is not under attack
 			if (!scoutUnderAttack)
 			{
@@ -97,7 +106,8 @@ void ScoutManager::moveScouts()
 				}
 
 				smartMove(workerScout, fleeTo);
-			}
+			} */
+			//
 		}
 		// if the scout is not in the enemy region
 		else if (scoutUnderAttack)
@@ -111,7 +121,7 @@ void ScoutManager::moveScouts()
 		}
 		
 	}
-
+	
 	// for each start location in the level
 	if (!enemyRegion)
 	{
@@ -376,6 +386,7 @@ BWAPI::Unit * ScoutManager::getEnemyGeyser()
 
 	BOOST_FOREACH (BWAPI::Unit * unit, enemyBaseLocation->getGeysers())
 	{
+		
 		geyser = unit;
 	}
 

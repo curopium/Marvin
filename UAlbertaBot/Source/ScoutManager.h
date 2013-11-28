@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "micromanagement/MicroManager.h"
 #include "micromanagement/MicroUtil.h"
+#include "BWAPI.h"
+#include "base/BuildingPlacer.h"
 
 class ScoutManager {
 
