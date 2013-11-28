@@ -783,9 +783,6 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 
 
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
-
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
@@ -808,9 +805,6 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
-
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
@@ -820,25 +814,36 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
-	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
-	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numMutas    =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numHydras   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	int numLurkers  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
 
-	int mutasWanted = numMutas + 4;
-	int hydrasWanted = numHydras + 6;
-	int ZerglingsWanted = numZerglings +6;
+	int mutasWanted =			numMutas + 4;
+	int hydrasWanted =			numHydras + 6;
+	int ZerglingsWanted =		numZerglings +6;
+	int LurkersWanted =			numLurkers + 4;
 
 	//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
 
 
 	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
+	
+	if (numHydras < 7)
+	{
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs,	1));
+	}
+	else
+	{
+	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Lurker, LurkersWanted));
 
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic,		medicsWanted));
+	}
+
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
+
+
 
  const int StrategyManager::getCurrentStrategy()
  {

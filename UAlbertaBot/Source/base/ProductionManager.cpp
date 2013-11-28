@@ -52,6 +52,9 @@ void ProductionManager::setSearchGoal(MetaPairVector & goal)
 	searchGoal = goal;
 }
 
+
+
+
 void ProductionManager::update() 
 {
 	// check the queue for stuff we can build
@@ -72,6 +75,7 @@ void ProductionManager::update()
 
 		performBuildOrderSearch(searchGoal);
 	}
+
 
 
 

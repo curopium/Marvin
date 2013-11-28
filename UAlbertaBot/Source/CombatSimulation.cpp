@@ -85,6 +85,13 @@ const SparCraft::Unit CombatSimulation::getSparCraftUnit(const UnitInfo & ui) co
 		type = BWAPI::UnitTypes::Terran_Battlecruiser;
 	}
 
+	//hack for lurkers
+	if (type == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		type = BWAPI::UnitTypes::Zerg_Hydralisk;
+	}
+
+
     return SparCraft::Unit( ui.type, 
                             SparCraft::Position(ui.lastPosition), 
                             ui.unitID, 
