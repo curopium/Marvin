@@ -97,13 +97,18 @@ void MicroManager::regroup(const BWAPI::Position & regroupPosition) const
 	BOOST_FOREACH (BWAPI::Unit * unit, units)
 	{
 
-		/*
+		
 		//check for burrow
+		/*
 		if( unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
 		{
-			if( unit->isBurrowed() == 1 )
+			
+			if( unit->isBurrowed() == true )
 			{
+				if( unit->isDetected() == true)
+				{
 				unit->unburrow();
+				}
 			}
 		}
 		*/

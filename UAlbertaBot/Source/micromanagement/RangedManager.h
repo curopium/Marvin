@@ -20,4 +20,7 @@ public:
 	BWAPI::Unit * getTarget(BWAPI::Unit * rangedUnit, UnitVector & targets);
 
 	void kiteTarget(BWAPI::Unit * rangedUnit, BWAPI::Unit * target);
+
+	void LurkerBurrow( BWAPI::Unit * rangedUnit );
+	void LurkerUnBurrow(BWAPI::Unit * rangedUnit);
 };

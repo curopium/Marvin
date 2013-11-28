@@ -78,4 +78,6 @@ public:
 	void						performBuildOrderSearch(const std::vector< std::pair<MetaType, UnitCountType> > & goal);
 	void						drawProductionInformation(int x, int y);
 	void						setSearchGoal(MetaPairVector & goal);
+
+
 };
