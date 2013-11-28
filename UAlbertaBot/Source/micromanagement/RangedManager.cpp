@@ -35,7 +35,16 @@ void RangedManager::executeMicro(const UnitVector & targets)
 				// find the best target for this zealot
 				BWAPI::Unit * target = getTarget(rangedUnit, rangedUnitTargets);
 
-				
+				/*
+				if ( rangedUnit->getType().groundWeapon().maxRange() < target->getDistance(rangedUnit))
+				{
+					if(rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+					{
+					//BWAPI::Broodwar->printf("############# Lurker in distance: %d ###############",  rangedUnit->getID());
+					LurkerBurrow(rangedUnit);
+					}
+				}
+				*/
 
 				// attack it
 				kiteTarget(rangedUnit, target);
@@ -111,13 +120,13 @@ void RangedManager::kiteTarget(BWAPI::Unit * rangedUnit, BWAPI::Unit * target)
 		BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition().x(), rangedUnit->getPosition().y(), 
 			fleePosition.x(), fleePosition.y(), BWAPI::Colors::Cyan);
 
-		LurkerUnBurrow(rangedUnit);
+		//LurkerUnBurrow(rangedUnit);
 		smartMove(rangedUnit, fleePosition);
 	}
 	// otherwise shoot
 	else
 	{
-		LurkerBurrow(rangedUnit);
+		//LurkerBurrow(rangedUnit);
 		smartAttackUnit(rangedUnit, target);
 	}
 }

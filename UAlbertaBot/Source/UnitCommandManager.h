@@ -36,4 +36,7 @@ public:
 
 	void waitCommand(BWAPI::Unit * unit);
 	void attackCommand(BWAPI::Unit * unit);
+
+
+
 };

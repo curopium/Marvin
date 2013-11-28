@@ -178,6 +178,18 @@ void MicroManager::smartAttackUnit(BWAPI::Unit * attacker, BWAPI::Unit * target)
 		return;
 	}
 
+	if (attacker->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		double range(attacker->getType().groundWeapon().maxRange());
+		double distance = attacker->getDistance(target);
+		if (distance <= range)
+		{
+			//BWAPI::Broodwar->printf("############# hello ###############");
+			LurkerBurrow(attacker);
+		}
+	}
+
+
 	// get the unit's current command
 	BWAPI::UnitCommand currentCommand(attacker->getLastCommand());
 
@@ -294,5 +306,28 @@ void MicroManager::drawOrderText() {
 
 	BOOST_FOREACH (BWAPI::Unit * unit, units) {
 		if (Options::Debug::DRAW_UALBERTABOT_DEBUG) BWAPI::Broodwar->drawTextMap(unit->getPosition().x(), unit->getPosition().y(), "%s", order.getStatus().c_str());
+	}
+}
+
+
+void MicroManager::LurkerBurrow(BWAPI::Unit * rangedUnit) const
+{
+	if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		if( rangedUnit->isBurrowed() == 0 )
+		{
+			rangedUnit->burrow();
+		}
+	}
+}
+
+void MicroManager::LurkerUnBurrow(BWAPI::Unit * rangedUnit) const
+{
+	if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		if( rangedUnit->isBurrowed() == 1 )
+		{
+			rangedUnit->unburrow();
+		}
 	}
 }

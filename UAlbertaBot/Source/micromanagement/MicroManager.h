@@ -47,4 +47,8 @@ public:
 	void				setUnits(const UnitVector & u);
 	void				execute(const SquadOrder & order);
 	void				regroup(const BWAPI::Position & regroupPosition) const;
+
+	void LurkerBurrow( BWAPI::Unit * rangedUnit ) const;
+	void LurkerUnBurrow(BWAPI::Unit * rangedUnit) const;
+
 };
