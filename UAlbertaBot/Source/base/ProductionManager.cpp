@@ -200,7 +200,7 @@ void ProductionManager::onUnitDestroy(BWAPI::Unit * unit)
 
 			if (unit->getType() != BWAPI::UnitTypes::Zerg_Drone)
 			{
-				performBuildOrderSearch(StrategyManager::Instance().getBuildOrderGoal());
+				//performBuildOrderSearch(StrategyManager::Instance().getBuildOrderGoal());
 			}
 		}
 	}
