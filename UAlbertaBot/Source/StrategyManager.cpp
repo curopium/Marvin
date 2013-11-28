@@ -35,7 +35,7 @@ void StrategyManager::addStrategies()
 	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
-	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 9 9 9 9 9 16 17 17 17 17 17 4 4 4 4  4 19 2 ";
+	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 16 2 9 9 9 9 9 9 9";
 	//zergOpeningBook[ZergLurkerRush]			= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 
 	if (selfRace == BWAPI::Races::Protoss)

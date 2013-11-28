@@ -30,17 +30,12 @@ void RangedManager::executeMicro(const UnitVector & targets)
 			// if there are targets
 			if (!rangedUnitTargets.empty())
 			{
-
-				if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
-				{
-					if( rangedUnit->isBurrowed() == 0 )
-					{
-						rangedUnit->burrow();
-					}
-				}
+				
 
 				// find the best target for this zealot
 				BWAPI::Unit * target = getTarget(rangedUnit, rangedUnitTargets);
+
+				
 
 				// attack it
 				kiteTarget(rangedUnit, target);
@@ -49,13 +44,6 @@ void RangedManager::executeMicro(const UnitVector & targets)
 			else
 			{
 
-				if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
-				{
-					if( rangedUnit->isBurrowed() == 1 )
-					{
-						rangedUnit->unburrow();
-					}
-				}
 
 				// if we're not near the order position
 				if (rangedUnit->getDistance(order.position) > 100)
@@ -86,6 +74,8 @@ void RangedManager::kiteTarget(BWAPI::Unit * rangedUnit, BWAPI::Unit * target)
 	// determine whether the target can be kited
 	if (range <= target->getType().groundWeapon().maxRange())
 	{
+
+		//LurkerUnBurrow(rangedUnit);
 		// if we can't kite it, there's no point
 		smartAttackUnit(rangedUnit, target);
 		return;
@@ -121,11 +111,13 @@ void RangedManager::kiteTarget(BWAPI::Unit * rangedUnit, BWAPI::Unit * target)
 		BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition().x(), rangedUnit->getPosition().y(), 
 			fleePosition.x(), fleePosition.y(), BWAPI::Colors::Cyan);
 
+		LurkerUnBurrow(rangedUnit);
 		smartMove(rangedUnit, fleePosition);
 	}
 	// otherwise shoot
 	else
 	{
+		LurkerBurrow(rangedUnit);
 		smartAttackUnit(rangedUnit, target);
 	}
 }
@@ -220,4 +212,26 @@ BWAPI::Unit * RangedManager::closestrangedUnit(BWAPI::Unit * target, std::set<BW
 	}
 	
 	return closest;
+}
+
+void RangedManager::LurkerBurrow(BWAPI::Unit * rangedUnit)
+{
+	if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		if( rangedUnit->isBurrowed() == 0 )
+		{
+			rangedUnit->burrow();
+		}
+	}
+}
+
+void RangedManager::LurkerUnBurrow(BWAPI::Unit * rangedUnit)
+{
+	if( rangedUnit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		if( rangedUnit->isBurrowed() == 1 )
+		{
+			rangedUnit->unburrow();
+		}
+	}
 }
