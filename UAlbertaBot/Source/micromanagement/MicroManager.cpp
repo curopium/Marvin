@@ -187,6 +187,10 @@ void MicroManager::smartAttackUnit(BWAPI::Unit * attacker, BWAPI::Unit * target)
 			//BWAPI::Broodwar->printf("############# hello ###############");
 			LurkerBurrow(attacker);
 		}
+		else
+		{
+			LurkerUnBurrow(attacker);
+		}
 	}
 
 
