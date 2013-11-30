@@ -10,6 +10,7 @@ StrategyManager::StrategyManager()
 {
 	addStrategies();
 	setStrategy();
+
 }
 
 // get an instance of this
@@ -21,6 +22,8 @@ StrategyManager & StrategyManager::Instance()
 
 void StrategyManager::addStrategies() 
 {
+
+
 	protossOpeningBook = std::vector<std::string>(NumProtossStrategies);
 	terranOpeningBook  = std::vector<std::string>(NumTerranStrategies);
 	zergOpeningBook    = std::vector<std::string>(NumZergStrategies);
@@ -206,8 +209,8 @@ void StrategyManager::setStrategy()
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
 			//currentStrategy = ZergZerglingRush;
-			currentStrategy = ZergMultaRush;
-			//currentStrategy = ZergLurkerRush;
+			//currentStrategy = ZergMultaRush;
+			currentStrategy = ZergLurkerRush;
 		}
 		//if cant find any, just pick the first
 		else
@@ -812,6 +815,9 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 
 const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 {
+
+	static bool has_expanded = 0;
+
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
@@ -845,14 +851,24 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 
 	}
 
-	/*
+	
 	if (expandZerg())
 	{
+		if(has_expanded == false)
+		{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
-		
+		has_expanded = true;
+		}
 	}
-	*/
+	else
+	{
+		has_expanded = false;
+	}
+	
+	if ( numextract < numhatch)
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+	}
 	
 	if(numDrone < (numhatch * 8))
 	{
