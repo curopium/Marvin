@@ -35,7 +35,7 @@ void StrategyManager::addStrategies()
 	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
-	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 16 2 9 9 9 9 9 9 9";
+	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 16 9 9 9 9 9 9 9";
 	//zergOpeningBook[ZergLurkerRush]			= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
 
 	if (selfRace == BWAPI::Races::Protoss)
@@ -707,7 +707,7 @@ const bool StrategyManager::expandZerg() const
 	// 2nd Nexus Conditions:
 	//		We have 12 or more hydralisks
 	//		It is past frame 7000
-	if ((numHatchery < 2) && (numZergling > 12 || frame > 9000))
+	if ((numHatchery < 2) && ( frame > 9000))
 	{
 		return true;
 	}
@@ -715,22 +715,22 @@ const bool StrategyManager::expandZerg() const
 	// 3nd Nexus Conditions:
 	//		We have 24 or more hydralisks
 	//		It is past frame 12000
-	if ((numHatchery < 3) && (numZergling > 24 || frame > 15000))
+	if ((numHatchery < 3) && ( frame > 15000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 4) && (numZergling > 24 || frame > 21000))
+	if ((numHatchery < 4) && ( frame > 21000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 5) && (numZergling > 24 || frame > 26000))
+	if ((numHatchery < 5) && ( frame > 26000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 6) && (numZergling > 24 || frame > 30000))
+	if ((numHatchery < 6) && (frame > 30000))
 	{
 		return true;
 	}
@@ -795,6 +795,7 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+		int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 
 	int mutasWanted = numMutas + 4;
 	int hydrasWanted = numHydras + 6;
@@ -814,15 +815,20 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
-	int numMutas    =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numMutas    =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
 	int numHydras   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
 	int numLurkers  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
+	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	int numextract     =		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Extractor);
+	int numDrone		=		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+
 
 	int mutasWanted =			numMutas + 4;
-	int hydrasWanted =			numHydras + 6;
-	int ZerglingsWanted =		numZerglings +6;
+	int hydrasWanted =			numHydras + 4;
+	int ZerglingsWanted =		numZerglings + 6;
 	int LurkersWanted =			numLurkers + 4;
+	int DronesWanted	=		numDrone + 6;
 
 	//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
 
@@ -839,6 +845,21 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 
 	}
 
+	/*
+	if (expandZerg())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+		
+	}
+	*/
+	
+	if(numDrone < (numhatch * 8))
+	{
+		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
+	}
+
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone, std::min(90, DronesWanted)));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
