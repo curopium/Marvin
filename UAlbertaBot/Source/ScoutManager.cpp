@@ -59,22 +59,24 @@ void ScoutManager::moveScouts()
 
 	// if we know where the enemy region is and where our scout is
 	if (enemyRegion && scoutRegion)
-	{
+	{ 
 		// if the scout is in the enemy region
 		if (scoutRegion == enemyRegion)
 		{
-			BWAPI::Unit * geyser = getEnemyGeyser();
+			BWAPI::Unit * geyser = getEnemyGeyser();	
+
+				workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
 			
-			workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
-			//int thing = static_cast<std::string>(workerScout->getLastCommand());
-			BWAPI::Broodwar->printf("%d", workerScout->getLastCommand().getType().getID());
+				BWAPI::Broodwar->printf("gets in here");
+							
 			std::vector<GroundThreat> groundThreats;
 			fillGroundThreats(groundThreats, workerScout->getPosition());
+
 
 			// get the closest enemy worker
 			BWAPI::Unit * closestWorker = closestEnemyWorker();
 			
-			/*
+			
 			// if the worker scout is not under attack
 			if (!scoutUnderAttack)
 			{
@@ -106,7 +108,7 @@ void ScoutManager::moveScouts()
 				}
 
 				smartMove(workerScout, fleeTo);
-			} */
+			} 
 			//
 		}
 		// if the scout is not in the enemy region
@@ -439,6 +441,8 @@ bool ScoutManager::immediateThreat()
 
 void ScoutManager::smartMove(BWAPI::Unit * attacker, BWAPI::Position targetPosition)
 {
+	
+
 	// if we have issued a command to this unit already this frame, ignore this one
 	if (attacker->getLastCommandFrame() >= BWAPI::Broodwar->getFrameCount())
 	{
@@ -453,7 +457,12 @@ void ScoutManager::smartMove(BWAPI::Unit * attacker, BWAPI::Position targetPosit
 	{
 		return;
 	}
-
+	
+	if (attacker->isConstructing())
+	{
+		return;
+	}
+	
 	// if nothing prevents it, attack the target
 	attacker->move(targetPosition);
 }
@@ -471,6 +480,11 @@ void ScoutManager::smartAttack(BWAPI::Unit * attacker, BWAPI::Unit * target)
 
 	// if we've already told this unit to attack this target, ignore this command
 	if (currentCommand.getType() == BWAPI::UnitCommandTypes::Attack_Unit && currentCommand.getTarget() == target)
+	{
+		return;
+	}
+
+	if (attacker->isConstructing())
 	{
 		return;
 	}
