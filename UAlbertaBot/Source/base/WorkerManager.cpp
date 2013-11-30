@@ -282,11 +282,20 @@ BWAPI::Unit * WorkerManager::getGasWorker(BWAPI::Unit * refinery)
 		if (workerData.getWorkerJob(unit) == WorkerData::Minerals)
 		{
 			double distance = unit->getDistance(refinery);
-			if (!closestWorker || distance < closestDistance)
-			{
-				closestWorker = unit;
-				closestDistance = distance;
-			}
+			BOOST_FOREACH (BWAPI::Unit * hbase, BWAPI::Broodwar->self()->getUnits())
+				{
+				if(hbase->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
+					{
+					if(hbase->getDistance(refinery) < 200 )
+						{
+						if (!closestWorker || distance < closestDistance)
+							{
+								closestWorker = unit;
+								closestDistance = distance;
+							}
+						}
+					}
+				}
 		}
 	}
 
