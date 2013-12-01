@@ -876,6 +876,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 
 	static bool has_expanded = 0;
 	static bool is_building_extractor = 0;
+	static bool is_researching = 0;
 
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
@@ -943,6 +944,37 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	{
 		//BWAPI::Broodwar->printf("############# need more drones!###############");
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
+	}
+
+	if(is_researching == 0)
+	{
+
+		if (BWAPI::Broodwar->getFrameCount() > 7000 )
+		{
+			if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
+			{
+				is_researching = true;
+
+				BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
+
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
+				{
+
+					BWAPI::Broodwar->printf("############# badger badger badger!###############");
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
+				}
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Antennae) == 0 )
+				{
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+				}
+			}
+			else 
+			{
+				goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+			}
+		}
 	}
 
 
