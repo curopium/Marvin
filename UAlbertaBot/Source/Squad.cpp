@@ -119,10 +119,11 @@ void Squad::setManagerUnits()
 
 	BOOST_FOREACH(BWAPI::Unit * unit, BWAPI::Broodwar->self()->getUnits())
 	{
-				if ((unit->getType() == BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Pneumatized_Carapace == 1)) )
+		
+				if ((unit->getType() == BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 1))
 			{
 				detectorUnits.push_back(unit);
-				BWAPI::Broodwar->printf("################ UPGRADED OVERLORD found #################### ");
+				//BWAPI::Broodwar->printf("################ UPGRADED OVERLORD found #################### ");
 			}
 	}
 	// add units to micro managers
