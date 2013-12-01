@@ -184,7 +184,16 @@ void StrategyManager::writeResults()
 void StrategyManager::setStrategy()
 {
 	// if we are using file io to determine strategy, do so
-	if (Options::Modules::USING_STRATEGY_IO)
+	
+
+
+
+	//*************************#*#*#*#*#*#*#*#*#*#*#*#*#* TOODO #############*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
+	//get rid of the ! in if options
+
+
+
+	if (!(Options::Modules::USING_STRATEGY_IO))
 	{
 		double bestUCB = -1;
 		int bestStrategyIndex = 0;
@@ -364,8 +373,8 @@ const int StrategyManager::defendWithWorkers()
 // freeUnits are the units available to do this attack
 const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 {
-	if( BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss )
-	{
+	//if( BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss )
+	//{
 		int ourForceSize = (int)freeUnits.size();
 
 		int numUnitsNeededForAttack = 1;
@@ -379,8 +388,8 @@ const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 		}
 
 		return doAttack || firstAttackSent;
-	}
-
+	//}
+	/*
 	else
 	{
 		int ourForceSize = (int)freeUnits.size();
@@ -397,6 +406,7 @@ const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 
 		return doAttack || firstAttackSent;
 	}
+	*/
 }
 
 const bool StrategyManager::expandProtossZealotRush() const
@@ -862,6 +872,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 {
 
 	static bool has_expanded = 0;
+	static bool is_building_extractor = 0;
 
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
@@ -910,10 +921,18 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	{
 		has_expanded = false;
 	}
-	
+
 	if ( numextract < (numhatch + numLair))
 	{
+		if(is_building_extractor == false)
+		{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+		is_building_extractor = true;
+		}
+	}
+	else
+	{
+		is_building_extractor = false;
 	}
 	
 
