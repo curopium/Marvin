@@ -248,8 +248,8 @@ void StrategyManager::setStrategy()
 
 
 			//currentStrategy = ZergZerglingRush;
-			//currentStrategy = ZergMultaRush;
-			currentStrategy = ZergLurkerRush;
+			currentStrategy = ZergMultaRush;
+			//currentStrategy = ZergLurkerRush;
 
 		}
 		// if cant find any, just pick the first
@@ -804,69 +804,195 @@ const bool StrategyManager::expandZerg() const
 
 const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 {
+
+	static bool has_expanded = 0;
+	static bool is_building_extractor = 0;
+	static bool is_researching = 0;
+
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
-	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
-	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numMutas    =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numHydras   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	int numLurkers  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
 	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	int numextract     =		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Extractor);
+	int numDrone		=		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+	int numLair		=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
 
-	int mutasWanted = numMutas + 6;
-	int hydrasWanted = numHydras + 6;
-	int ZerglingsWanted = numZerglings +6;
+
+	int mutasWanted =			numMutas + 4;
+	int hydrasWanted =			numHydras + 4;
+	int ZerglingsWanted =		numZerglings + 6;
+	int LurkersWanted =			numLurkers + 4;
+	int DronesWanted	=		numDrone + 6;
 
 
-	if (InformationManager::Instance().enemyHasCloakedUnits())
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
+
+	
+	if (expandZerg())
 	{
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
+		if(has_expanded == false)
 		{
-			if(BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Pneumatized_Carapace == false))
-			{
-				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
-			}
-			if(BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Antennae == false))
-			{
-				goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
-			}
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
+		has_expanded = true;
 		}
-		else 
+	}
+	else
+	{
+		has_expanded = false;
+	}
+
+	if ( numextract < ((numhatch + numLair) -1))
+	{
+		if(is_building_extractor == false)
 		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+		is_building_extractor = true;
+		}
+	}
+	else
+	{
+		is_building_extractor = false;
+	}
+	
+
+	if(numDrone < ((numhatch + numLair) * 11))
+	{
+		//BWAPI::Broodwar->printf("############# need more drones!###############");
+		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
+	}
+
+	if(is_researching == 0)
+	{
+
+		if (BWAPI::Broodwar->getFrameCount() > 7000 )
+		{
+			if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
+			{
+				is_researching = true;
+
+				//BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
+
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
+				{
+
+					//BWAPI::Broodwar->printf("############# badger badger badger!###############");
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
+				}
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Antennae) == 0 )
+				{
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+				}
+			}
+			else 
+			{
+				//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+			}
 		}
 	}
 
-
-	//if (expandZerg())
-	//{
-	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
-	//}
-
-
-	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
 const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 {
+		static bool has_expanded = 0;
+	static bool is_building_extractor = 0;
+	static bool is_researching = 0;
+
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
-	int numMutas  =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
-	int numHydras  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
+	int numMutas    =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk);
+	int numHydras   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZerglings=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
-		int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
-
-	int mutasWanted = numMutas + 4;
-	int hydrasWanted = numHydras + 6;
-	int ZerglingsWanted = numZerglings +6;
-
-	//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
+	int numLurkers  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
+	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
+	int numextract     =		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Extractor);
+	int numDrone		=		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+	int numLair		=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
 
 
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
-	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
+	int mutasWanted =			numMutas + 4;
+	int hydrasWanted =			numHydras + 4;
+	int ZerglingsWanted =		numZerglings + 6;
+	int LurkersWanted =			numLurkers + 4;
+	int DronesWanted	=		numDrone + 6;
+
+
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Mutalisk, mutasWanted));
+
+	
+	if (expandZerg())
+	{
+		if(has_expanded == false)
+		{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
+		has_expanded = true;
+		}
+	}
+	else
+	{
+		has_expanded = false;
+	}
+
+	if ( numextract < (numhatch + numLair))
+	{
+		if(is_building_extractor == false)
+		{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+		is_building_extractor = true;
+		}
+	}
+	else
+	{
+		is_building_extractor = false;
+	}
+	
+
+	if(numDrone < ((numhatch + numLair) * 11))
+	{
+		//BWAPI::Broodwar->printf("############# need more drones!###############");
+		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
+	}
+
+	if(is_researching == 0)
+	{
+
+		if (BWAPI::Broodwar->getFrameCount() > 7000 )
+		{
+			if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lair) > 0)
+			{
+				is_researching = true;
+
+				//BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
+
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
+				{
+
+					//BWAPI::Broodwar->printf("############# badger badger badger!###############");
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
+				}
+
+				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Antennae) == 0 )
+				{
+					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Antennae, 1));
+				}
+			}
+			else 
+			{
+				//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Lair, 1));
+			}
+		}
+	}
+
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
@@ -897,11 +1023,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	int LurkersWanted =			numLurkers + 4;
 	int DronesWanted	=		numDrone + 6;
 
-	//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
 
-
-	//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Zergling, ZerglingsWanted));
-	
 	if (numHydras < 7)
 	{
 	goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Hydralisk, hydrasWanted));
@@ -955,13 +1077,10 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 			{
 				is_researching = true;
 
-				BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
-
-
+	
 				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
 				{
 
-					BWAPI::Broodwar->printf("############# badger badger badger!###############");
 					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
 				}
 
