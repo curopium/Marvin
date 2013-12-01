@@ -76,6 +76,7 @@ void StrategyManager::addStrategies()
 		results = std::vector<IntPair>(NumZergStrategies);
 		usableStrategies.push_back(ZergZerglingRush);
 		usableStrategies.push_back(ZergMultaRush);
+		usableStrategies.push_back(ZergLurkerRush);
 	}
 
 	if (Options::Modules::USING_STRATEGY_IO)
@@ -92,8 +93,8 @@ void StrategyManager::readResults()
 	// if the file doesn't exist something is wrong so just set them to default settings
 	if (stat(Options::FileIO::FILE_SETTINGS, &buf) == -1)
 	{
-		readDir = "bwapi-data/testio/read/";
-		writeDir = "bwapi-data/testio/write/";
+		readDir = "bwapi-data\\read\\";
+		writeDir = "bwapi-data\\write\\";
 	}
 	else
 	{
@@ -116,18 +117,36 @@ void StrategyManager::readResults()
 	{
 		std::ifstream f_in(readFile.c_str());
 		std::string line;
-		getline(f_in, line);
-		results[ProtossZealotRush].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossZealotRush].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].second = atoi(line.c_str());
+		if (selfRace == BWAPI::Races::Zerg)
+		{
+			getline(f_in, line);
+			results[ZergZerglingRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergZerglingRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergMultaRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergMultaRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergLurkerRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergLurkerRush].second = atoi(line.c_str());
+		}
+		else
+		{
+			getline(f_in, line);
+			results[ProtossZealotRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossZealotRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDarkTemplar].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDarkTemplar].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDragoons].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDragoons].second = atoi(line.c_str());
+		}
 		f_in.close();
 	}
 
@@ -140,12 +159,24 @@ void StrategyManager::writeResults()
 	std::string writeFile = writeDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 	std::ofstream f_out(writeFile.c_str());
 
-	f_out << results[ProtossZealotRush].first   << "\n";
-	f_out << results[ProtossZealotRush].second  << "\n";
-	f_out << results[ProtossDarkTemplar].first  << "\n";
-	f_out << results[ProtossDarkTemplar].second << "\n";
-	f_out << results[ProtossDragoons].first     << "\n";
-	f_out << results[ProtossDragoons].second    << "\n";
+	if (selfRace == BWAPI::Races::Zerg)
+	{
+		f_out << results[ZergZerglingRush].first   << "\n";
+		f_out << results[ZergZerglingRush].second  << "\n";
+		f_out << results[ZergMultaRush].first      << "\n";
+		f_out << results[ZergMultaRush].second     << "\n";
+		f_out << results[ZergLurkerRush].first     << "\n";
+		f_out << results[ZergLurkerRush].second    << "\n";
+	}
+	else
+	{
+		f_out << results[ProtossZealotRush].first   << "\n";
+		f_out << results[ProtossZealotRush].second  << "\n";
+		f_out << results[ProtossDarkTemplar].first  << "\n";
+		f_out << results[ProtossDarkTemplar].second << "\n";
+		f_out << results[ProtossDragoons].first     << "\n";
+		f_out << results[ProtossDragoons].second    << "\n";
+	}
 
 	f_out.close();
 }
@@ -202,21 +233,22 @@ void StrategyManager::setStrategy()
 
 		}
 
-		//if your zerg
+		// if your zerg
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
-			currentStrategy = ZergZerglingRush;
+
+
+			//currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
-			//currentStrategy = ZergLurkerRush;
+			currentStrategy = ZergLurkerRush;
+
 		}
-		//if cant find any, just pick the first
+		// if cant find any, just pick the first
 		else
 		{
-			currentStrategy = ZergZerglingRush;
-			//currentStrategy = ZergMultaRush;
+			currentStrategy = 0;
 		}
 		//BWAPI::Broodwar->printf("Current strategy: %d #################### ", getCurrentStrategy());
-
 	}
 
 }
@@ -335,19 +367,39 @@ const int StrategyManager::defendWithWorkers()
 // freeUnits are the units available to do this attack
 const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 {
-	int ourForceSize = (int)freeUnits.size();
-
-	int numUnitsNeededForAttack = 1;
-
-	bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) >= 1
-					|| ourForceSize >= numUnitsNeededForAttack;
-
-	if (doAttack)
+	if( BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss )
 	{
-		firstAttackSent = true;
+		int ourForceSize = (int)freeUnits.size();
+
+		int numUnitsNeededForAttack = 1;
+
+		bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) >= 1
+						|| ourForceSize >= numUnitsNeededForAttack;
+
+		if (doAttack)
+		{
+			firstAttackSent = true;
+		}
+
+		return doAttack || firstAttackSent;
 	}
 
-	return doAttack || firstAttackSent;
+	else
+	{
+		int ourForceSize = (int)freeUnits.size();
+
+		int numUnitsNeededForAttack = 1;
+
+		bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Lurker) >= 20
+						|| ourForceSize >= numUnitsNeededForAttack;
+
+		if (doAttack)
+		{
+			firstAttackSent = true;
+		}
+
+		return doAttack || firstAttackSent;
+	}
 }
 
 const bool StrategyManager::expandProtossZealotRush() const
@@ -431,32 +483,27 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 	{
 		if(getCurrentStrategy() == ZergZerglingRush)
 		{
-
 			//BWAPI::Broodwar->printf("#############Zerg Zergling Detected!###############");
 			return getZergZerglingBuildOrderGoal();
-			//return getZergmutaliskBuildOrderGoal();
 		}
-
 		else if(getCurrentStrategy() == ZergMultaRush)
 		{
-			//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
+			//BWAPI::Broodwar->printf("#############Zerg Multa Detected!###############");
 			return getZergmutaliskBuildOrderGoal();
-			//return getZergZerglingBuildOrderGoal();
 		}
-
 		else if(getCurrentStrategy() == ZergLurkerRush)
-		// if something goes wrong, use zergling goal
 		{
 			return getZergLurkerBuildOrderGoal();
 		}
+
+		// if something goes wrong, use zergling goal
 		return getZergZerglingBuildOrderGoal();
-		
 	}
 }
 
 const MetaPairVector StrategyManager::getProtossDragoonsBuildOrderGoal() const
 {
-		// the goal to return
+	// the goal to return
 	MetaPairVector goal;
 
 	int numDragoons =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Dragoon);
@@ -697,6 +744,10 @@ const bool StrategyManager::expandZerg() const
 	int numHatchery =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 	int numHydralisk  =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hydralisk);
 	int numZergling   =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Zergling);
+	int numLair =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
+	int numHive =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hive);
+
+	int numExpansions = numHatchery + numLair + numHive;
 
 	// if there are more than 10 idle workers, expand
 	if (WorkerManager::Instance().getNumIdleWorkers() > 10)
@@ -707,7 +758,7 @@ const bool StrategyManager::expandZerg() const
 	// 2nd Nexus Conditions:
 	//		We have 12 or more hydralisks
 	//		It is past frame 7000
-	if ((numHatchery < 2) && ( frame > 9000))
+	if ((numExpansions < 2) && ( frame > 9000))
 	{
 		return true;
 	}
@@ -715,22 +766,22 @@ const bool StrategyManager::expandZerg() const
 	// 3nd Nexus Conditions:
 	//		We have 24 or more hydralisks
 	//		It is past frame 12000
-	if ((numHatchery < 3) && ( frame > 15000))
+	if ((numExpansions < 3) && ( frame > 15000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 4) && ( frame > 21000))
+	if ((numExpansions < 4) && ( frame > 21000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 5) && ( frame > 26000))
+	if ((numExpansions < 5) && ( frame > 26000))
 	{
 		return true;
 	}
 
-	if ((numHatchery < 6) && (frame > 30000))
+	if ((numExpansions < 6) && (frame > 30000))
 	{
 		return true;
 	}
@@ -812,6 +863,9 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 
 const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 {
+
+	static bool has_expanded = 0;
+
 	// the goal to return
 	std::vector< std::pair<MetaType, UnitCountType> > goal;
 	
@@ -822,6 +876,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 	int numextract     =		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Extractor);
 	int numDrone		=		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+	int numLair		=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
 
 
 	int mutasWanted =			numMutas + 4;
@@ -845,21 +900,32 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 
 	}
 
-	/*
+	
 	if (expandZerg())
 	{
+		if(has_expanded == false)
+		{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Hatchery, numhatch + 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
-		
+		has_expanded = true;
+		}
 	}
-	*/
-	
-	if(numDrone < (numhatch * 8))
+	else
 	{
+		has_expanded = false;
+	}
+	
+	if ( numextract < (numhatch + numLair))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
+	}
+	
+
+	if(numDrone < ((numhatch + numLair) * 11))
+	{
+		//BWAPI::Broodwar->printf("############# need more drones!###############");
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
 	}
 
-	//goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Drone, std::min(90, DronesWanted)));
 
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }

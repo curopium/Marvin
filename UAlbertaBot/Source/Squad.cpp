@@ -217,10 +217,12 @@ bool Squad::needsToRegroup()
 	
 	int NumberOfLurkers = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lurker);
 
+	
 	if (NumberOfLurkers > 20)
 	{
 		retreat = false;
 	}
+	
 	
 
 	if (retreat)
