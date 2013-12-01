@@ -67,7 +67,7 @@ void ScoutManager::moveScouts()
 
 				workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
 			
-				BWAPI::Broodwar->printf("gets in here");
+				//BWAPI::Broodwar->printf("gets in here");
 							
 			std::vector<GroundThreat> groundThreats;
 			fillGroundThreats(groundThreats, workerScout->getPosition());
@@ -83,7 +83,7 @@ void ScoutManager::moveScouts()
 				// if there is a worker nearby, harass it
 				if (closestWorker && (workerScout->getDistance(closestWorker) < 800))
 				{
-					smartAttack(workerScout, closestWorker);
+					//smartAttack(workerScout, closestWorker);
 				}
 				// otherwise keep moving to the enemy region
 				else

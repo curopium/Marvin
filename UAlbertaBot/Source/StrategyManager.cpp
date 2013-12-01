@@ -828,6 +828,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 	int numhatch     =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Hatchery);
 	int numextract     =		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Extractor);
 	int numDrone		=		BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Drone);
+	int numLair		=			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Zerg_Lair);
 
 
 	int mutasWanted =			numMutas + 4;
@@ -865,13 +866,15 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 		has_expanded = false;
 	}
 	
-	if ( numextract < numhatch)
+	if ( numextract < (numhatch + numLair))
 	{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Zerg_Extractor, numhatch));
 	}
 	
-	if(numDrone < (numhatch * 8))
+
+	if(numDrone < ((numhatch + numLair) * 10))
 	{
+		//BWAPI::Broodwar->printf("############# need more drones!###############");
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
 	}
 
