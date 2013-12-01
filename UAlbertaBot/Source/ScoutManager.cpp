@@ -67,7 +67,7 @@ void ScoutManager::moveScouts()
 
 				workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
 			
-				BWAPI::Broodwar->printf("gets in here");
+				//BWAPI::Broodwar->printf("gets in here");
 							
 			std::vector<GroundThreat> groundThreats;
 			fillGroundThreats(groundThreats, workerScout->getPosition());
