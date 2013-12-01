@@ -34,6 +34,7 @@ void DetectorManager::executeMicro(const UnitVector & targets)
 	}
 
 	bool detectorUnitInBattle = false;
+	bool detectorUnitInExplore = false;
 
 	// for each detectorUnit
 	BOOST_FOREACH(BWAPI::Unit * detectorUnit, detectorUnits)
@@ -48,8 +49,11 @@ void DetectorManager::executeMicro(const UnitVector & targets)
 		// send him to scout around the map
 		else
 		{
+			if(!detectorUnitInExplore){
 			BWAPI::Position explorePosition = MapGrid::Instance().getLeastExplored();
 			smartMove(detectorUnit, explorePosition);
+			detectorUnitInExplore = true;
+			}
 		}
 	}
 }
