@@ -10,7 +10,6 @@ StrategyManager::StrategyManager()
 {
 	addStrategies();
 	setStrategy();
-
 }
 
 // get an instance of this
@@ -22,8 +21,6 @@ StrategyManager & StrategyManager::Instance()
 
 void StrategyManager::addStrategies() 
 {
-
-
 	protossOpeningBook = std::vector<std::string>(NumProtossStrategies);
 	terranOpeningBook  = std::vector<std::string>(NumTerranStrategies);
 	zergOpeningBook    = std::vector<std::string>(NumZergStrategies);
@@ -79,6 +76,7 @@ void StrategyManager::addStrategies()
 		results = std::vector<IntPair>(NumZergStrategies);
 		usableStrategies.push_back(ZergZerglingRush);
 		usableStrategies.push_back(ZergMultaRush);
+		usableStrategies.push_back(ZergLurkerRush);
 	}
 
 	if (Options::Modules::USING_STRATEGY_IO)
@@ -95,8 +93,8 @@ void StrategyManager::readResults()
 	// if the file doesn't exist something is wrong so just set them to default settings
 	if (stat(Options::FileIO::FILE_SETTINGS, &buf) == -1)
 	{
-		readDir = "bwapi-data/testio/read/";
-		writeDir = "bwapi-data/testio/write/";
+		readDir = "bwapi-data\\read\\";
+		writeDir = "bwapi-data\\write\\";
 	}
 	else
 	{
@@ -119,18 +117,36 @@ void StrategyManager::readResults()
 	{
 		std::ifstream f_in(readFile.c_str());
 		std::string line;
-		getline(f_in, line);
-		results[ProtossZealotRush].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossZealotRush].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].second = atoi(line.c_str());
+		if (selfRace == BWAPI::Races::Zerg)
+		{
+			getline(f_in, line);
+			results[ZergZerglingRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergZerglingRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergMultaRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergMultaRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergLurkerRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ZergLurkerRush].second = atoi(line.c_str());
+		}
+		else
+		{
+			getline(f_in, line);
+			results[ProtossZealotRush].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossZealotRush].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDarkTemplar].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDarkTemplar].second = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDragoons].first = atoi(line.c_str());
+			getline(f_in, line);
+			results[ProtossDragoons].second = atoi(line.c_str());
+		}
 		f_in.close();
 	}
 
@@ -143,12 +159,24 @@ void StrategyManager::writeResults()
 	std::string writeFile = writeDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 	std::ofstream f_out(writeFile.c_str());
 
-	f_out << results[ProtossZealotRush].first   << "\n";
-	f_out << results[ProtossZealotRush].second  << "\n";
-	f_out << results[ProtossDarkTemplar].first  << "\n";
-	f_out << results[ProtossDarkTemplar].second << "\n";
-	f_out << results[ProtossDragoons].first     << "\n";
-	f_out << results[ProtossDragoons].second    << "\n";
+	if (selfRace == BWAPI::Races::Zerg)
+	{
+		f_out << results[ZergZerglingRush].first   << "\n";
+		f_out << results[ZergZerglingRush].second  << "\n";
+		f_out << results[ZergMultaRush].first      << "\n";
+		f_out << results[ZergMultaRush].second     << "\n";
+		f_out << results[ZergLurkerRush].first     << "\n";
+		f_out << results[ZergLurkerRush].second    << "\n";
+	}
+	else
+	{
+		f_out << results[ProtossZealotRush].first   << "\n";
+		f_out << results[ProtossZealotRush].second  << "\n";
+		f_out << results[ProtossDarkTemplar].first  << "\n";
+		f_out << results[ProtossDarkTemplar].second << "\n";
+		f_out << results[ProtossDragoons].first     << "\n";
+		f_out << results[ProtossDragoons].second    << "\n";
+	}
 
 	f_out.close();
 }
@@ -205,21 +233,19 @@ void StrategyManager::setStrategy()
 
 		}
 
-		//if your zerg
+		// if your zerg
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
 			//currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
 			currentStrategy = ZergLurkerRush;
 		}
-		//if cant find any, just pick the first
+		// if cant find any, just pick the first
 		else
 		{
-			currentStrategy = ZergZerglingRush;
-			//currentStrategy = ZergMultaRush;
+			currentStrategy = 0;
 		}
 		//BWAPI::Broodwar->printf("Current strategy: %d #################### ", getCurrentStrategy());
-
 	}
 
 }
@@ -434,32 +460,27 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 	{
 		if(getCurrentStrategy() == ZergZerglingRush)
 		{
-
 			//BWAPI::Broodwar->printf("#############Zerg Zergling Detected!###############");
 			return getZergZerglingBuildOrderGoal();
-			//return getZergmutaliskBuildOrderGoal();
 		}
-
 		else if(getCurrentStrategy() == ZergMultaRush)
 		{
-			//BWAPI::Broodwar->printf("#############Zerg multa Detected!###############");
+			//BWAPI::Broodwar->printf("#############Zerg Multa Detected!###############");
 			return getZergmutaliskBuildOrderGoal();
-			//return getZergZerglingBuildOrderGoal();
 		}
-
 		else if(getCurrentStrategy() == ZergLurkerRush)
-		// if something goes wrong, use zergling goal
 		{
 			return getZergLurkerBuildOrderGoal();
 		}
+
+		// if something goes wrong, use zergling goal
 		return getZergZerglingBuildOrderGoal();
-		
 	}
 }
 
 const MetaPairVector StrategyManager::getProtossDragoonsBuildOrderGoal() const
 {
-		// the goal to return
+	// the goal to return
 	MetaPairVector goal;
 
 	int numDragoons =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Dragoon);
