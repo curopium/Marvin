@@ -245,9 +245,12 @@ void StrategyManager::setStrategy()
 		// if your zerg
 		if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 		{
+
+
 			//currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
 			currentStrategy = ZergLurkerRush;
+
 		}
 		// if cant find any, just pick the first
 		else

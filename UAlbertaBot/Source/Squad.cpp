@@ -12,6 +12,7 @@ Squad::Squad(const UnitVector & units, SquadOrder order)
 
 void Squad::update()
 {
+
 	// update all necessary unit information within this squad
 	updateUnits();
 
@@ -58,6 +59,7 @@ void Squad::update()
 
 void Squad::updateUnits()
 {
+
 	setAllUnits();
 	setNearEnemyUnits();
 	setManagerUnits();
@@ -79,6 +81,7 @@ void Squad::setAllUnits()
 		}
 	}
 	units = goodUnits;
+
 }
 
 void Squad::setNearEnemyUnits()
@@ -112,21 +115,24 @@ void Squad::setManagerUnits()
 	UnitVector rangedUnits;
 	UnitVector detectorUnits;
 	UnitVector transportUnits;
+	
 
+	BOOST_FOREACH(BWAPI::Unit * unit, BWAPI::Broodwar->self()->getUnits())
+	{
+				if ((unit->getType() == BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->hasResearched(BWAPI::UpgradeTypes::Pneumatized_Carapace == 1)) )
+			{
+				detectorUnits.push_back(unit);
+				BWAPI::Broodwar->printf("################ UPGRADED OVERLORD found #################### ");
+			}
+	}
 	// add units to micro managers
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
 	{
+			
+
+
 		if(unit->isCompleted() && unit->getHitPoints() > 0 && unit->exists())
-		{
-
-			/*
-			//BWAPI::Broodwar->printf("################ OVERLORD found #################### ");
-
-			if (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord)
-			{
-				BWAPI::Broodwar->printf("################ OVERLORD found #################### ");
-			}
-			*/
+		{		
 			
 
 			// select dector units
@@ -293,7 +299,7 @@ BWAPI::Unit * Squad::unitClosestToEnemy()
 
 	BOOST_FOREACH (BWAPI::Unit * unit, units)
 	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer)
+		if ((unit->getType() == BWAPI::UnitTypes::Protoss_Observer) || (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord))
 		{
 			continue;
 		}
@@ -312,7 +318,7 @@ BWAPI::Unit * Squad::unitClosestToEnemy()
 	{
 		BOOST_FOREACH (BWAPI::Unit * unit, units)
 		{
-			if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer)
+			if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer || (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord))
 			{
 				continue;
 			}
