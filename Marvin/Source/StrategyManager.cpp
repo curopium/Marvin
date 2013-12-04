@@ -248,8 +248,8 @@ void StrategyManager::setStrategy()
 
 
 			//currentStrategy = ZergZerglingRush;
-			currentStrategy = ZergMultaRush;
-			//currentStrategy = ZergLurkerRush;
+			//currentStrategy = ZergMultaRush;
+			currentStrategy = ZergLurkerRush;
 
 		}
 		// if cant find any, just pick the first
