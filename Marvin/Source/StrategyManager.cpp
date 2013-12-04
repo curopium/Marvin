@@ -32,7 +32,7 @@ void StrategyManager::addStrategies()
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
-	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4 0 0 0 1 2 4 4 4 5 0 0 0 6";
+	zergOpeningBook[ZergZerglingRush]		= "0 3 4 4 4 0 0 0 1 4 4 4 5 0 0 0 6";
 	//zergOpeningBook[ZergZerglingRush]		=" 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 10 10  ";
 	zergOpeningBook[ZergMultaRush]			= " 0 0 0 0 0 3 0 5 1 0 4 4 4 12 6 0 0 0 0 0 0 0 0 0 0 1 8 10 2 10 10 10 10 10 10 10";
 	zergOpeningBook[ZergLurkerRush]			= " 0 0 0 0 0 3 0 1 5 0 0 0 6 0 7 0 0 0 1 16 9 9 9 9 9 9 9";
@@ -187,13 +187,8 @@ void StrategyManager::setStrategy()
 	
 
 
-
-	//*************************#*#*#*#*#*#*#*#*#*#*#*#*#* TOODO #############*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
-	//get rid of the ! in if options
-
-
-
-	if (!(Options::Modules::USING_STRATEGY_IO))
+	//add a "!" in the if statement if you dont want to use ubc search
+	if ((Options::Modules::USING_STRATEGY_IO))
 	{
 		double bestUCB = -1;
 		int bestStrategyIndex = 0;
@@ -247,9 +242,9 @@ void StrategyManager::setStrategy()
 		{
 
 
-			//currentStrategy = ZergZerglingRush;
+			currentStrategy = ZergZerglingRush;
 			//currentStrategy = ZergMultaRush;
-			currentStrategy = ZergLurkerRush;
+			//currentStrategy = ZergLurkerRush;
 
 		}
 		// if cant find any, just pick the first
