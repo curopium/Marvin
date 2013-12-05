@@ -2,6 +2,10 @@ How to compile: open the sln in the ../VisualStudio folder, then in visual studi
 tab and click on build solution. There will be warnings but they were from David Churchill's original UAlbertaBot.
 Marvin.dll will be in the created release folder.
 
+instructions for people who dont have the visual studio requirements:
+( If you have problems compiling due to Visual Studio issues, refear to: http://code.google.com/p/ualbertabot/wiki/Instructions
+you will also need Visual Studio 2008 (All stuff needed to compile the vanilla UAlbertaBot) )
+
 Changes:
 		
 Strategy Manager:
