@@ -837,6 +837,7 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 		has_expanded = false;
 	}
 
+	//will make 1 extracter per hatchery - 1
 	if ( numextract < ((numhatch + numLair) -1))
 	{
 		if(is_building_extractor == false)
@@ -851,12 +852,14 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 	}
 	
 
+	//makes 11 drones per hatchery
 	if(numDrone < ((numhatch + numLair) * 11))
 	{
 		//BWAPI::Broodwar->printf("############# need more drones!###############");
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
 	}
 
+	//will research overlord upgrades, makes sure that it dosent try to research it twice
 	if(is_researching == 0)
 	{
 
@@ -866,13 +869,12 @@ const MetaPairVector StrategyManager::getZergZerglingBuildOrderGoal() const
 			{
 				is_researching = true;
 
-				//BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
 
 
 				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
 				{
 
-					//BWAPI::Broodwar->printf("############# badger badger badger!###############");
+					
 					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
 				}
 
@@ -934,6 +936,7 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 		has_expanded = false;
 	}
 
+	//will make one extractor per hatchery
 	if ( numextract < (numhatch + numLair))
 	{
 		if(is_building_extractor == false)
@@ -947,13 +950,14 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 		is_building_extractor = false;
 	}
 	
-
+	//will make 11 drones per hatchery
 	if(numDrone < ((numhatch + numLair) * 11))
 	{
-		//BWAPI::Broodwar->printf("############# need more drones!###############");
+
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
 	}
 
+	//will research overlord upgrades, makes sure that it dosent try to research it twice
 	if(is_researching == 0)
 	{
 
@@ -963,13 +967,11 @@ const MetaPairVector StrategyManager::getZergmutaliskBuildOrderGoal() const
 			{
 				is_researching = true;
 
-				//BWAPI::Broodwar->printf("############# has researched pneuma %d !###############", BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace));
 
 
 				if(BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) == 0)
 				{
 
-					//BWAPI::Broodwar->printf("############# badger badger badger!###############");
 					goal.push_back(MetaPair(BWAPI::UpgradeTypes::Pneumatized_Carapace, 1));
 				}
 
@@ -1040,6 +1042,7 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 		has_expanded = false;
 	}
 
+	//will make one extractor per hatchery
 	if ( numextract < (numhatch + numLair))
 	{
 		if(is_building_extractor == false)
@@ -1056,10 +1059,11 @@ const MetaPairVector StrategyManager::getZergLurkerBuildOrderGoal() const
 
 	if(numDrone < ((numhatch + numLair) * 11))
 	{
-		//BWAPI::Broodwar->printf("############# need more drones!###############");
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Zerg_Drone, DronesWanted));
 	}
 
+
+	//Researches Overloard upgrades and make sure they dont include the overloard upgrades more then once
 	if(is_researching == 0)
 	{
 
