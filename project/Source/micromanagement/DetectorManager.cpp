@@ -33,6 +33,8 @@ void DetectorManager::executeMicro(const UnitVector & targets)
 		}
 	}
 
+	// added the detector unit in explore to only send one detector to explore
+	// 
 	bool detectorUnitInBattle = false;
 	bool detectorUnitInExplore = false;
 

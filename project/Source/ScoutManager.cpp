@@ -64,10 +64,10 @@ void ScoutManager::moveScouts()
 		if (scoutRegion == enemyRegion)
 		{
 			BWAPI::Unit * geyser = getEnemyGeyser();	
-
+				
+			//build an extractor at the enemy possible geyser position
 				workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);
 			
-				//BWAPI::Broodwar->printf("gets in here");
 							
 			std::vector<GroundThreat> groundThreats;
 			fillGroundThreats(groundThreats, workerScout->getPosition());
@@ -457,7 +457,7 @@ void ScoutManager::smartMove(BWAPI::Unit * attacker, BWAPI::Position targetPosit
 	{
 		return;
 	}
-	
+	// If the unit is told to build, make sure it finishes before going anywhere
 	if (attacker->isConstructing())
 	{
 		return;

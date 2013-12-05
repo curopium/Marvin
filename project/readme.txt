@@ -37,3 +37,17 @@ ProductionManager:
 		-update() 
 		//made it handle overlords better
 		-detectBuildOrderDeadlock()
+
+Scout Manager:
+	modified move scout():
+		-added a build function for the scout to build an extractor (workerScout->build(geyser->getTilePosition(), BWAPI::UnitTypes::Zerg_Extractor);)
+	modified smart move():
+		-added a check so the build command doesn't get overwritten by the move command
+		
+Squad:
+	modified set Manager Unit:
+		modified to add upgraded overlords to the detector squad
+
+MapGrid:
+	modified getleast explored:
+		Changed it to never consider enemy bases as possible exploration grounds

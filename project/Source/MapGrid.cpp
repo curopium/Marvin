@@ -31,7 +31,7 @@ BWAPI::Position MapGrid::getLeastExplored()
 	int minSeen = 1000000;
 	double minSeenDist = 100000;
 	int leastRow(0), leastCol(0);
-
+	//get ennemy base location 
 	BWTA::BaseLocation * enemyBaseLocation = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy());
 	BWTA::Region * enemyRegion = enemyBaseLocation ? enemyBaseLocation->getRegion() : NULL;
 
@@ -42,7 +42,7 @@ BWAPI::Position MapGrid::getLeastExplored()
 		{
 			// get the center of this cell
 			BWAPI::Position cellCenter = getCellCenter(r,c);
-
+			// calculate enemy region
 			BWAPI::TilePosition exploreTile = BWAPI::TilePosition(cellCenter);
 			BWTA::Region * exploreRegion = exploreTile.isValid() ? BWTA::getRegion(exploreTile) : NULL;
 
@@ -51,7 +51,7 @@ BWAPI::Position MapGrid::getLeastExplored()
 			{
 				continue;
 			}
-
+			// do not go to enemy region
 			if (exploreRegion == enemyRegion)
 			{
 				continue;
